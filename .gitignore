@@ -1,3 +1,4 @@
-Java-Consumers/target
-Java-Consumers/Kafka-Simulation.iml
+/target
+Kafka-Simulation.iml
 /.idea
+pom.xml
