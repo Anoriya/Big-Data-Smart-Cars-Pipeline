@@ -12,7 +12,7 @@ import java.util.Properties;
 
 public abstract class AbstractConsumer {
 
-    private final static String BOOTSTRAP_SERVERS = "localhost:9092";
+    private final static String BOOTSTRAP_SERVERS = "quickstart.cloudera:9092";
     private final Consumer<String, String> consumer;
 
     protected AbstractConsumer(String group_id, String offset_reset, String auto_commit) {
