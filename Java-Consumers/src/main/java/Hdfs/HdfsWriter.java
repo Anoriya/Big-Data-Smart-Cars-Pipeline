@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class HdfsWriter {
 
     private static final Logger logger = Logger.getLogger("io.saagie.example.hdfs.Main");
-    private final String HDFSURI = "hdfs://localhost:8020";
+    private final String HDFSURI = "hdfs://quickstart.cloudera:8020";
     private final Configuration CONF = new Configuration();
     private final FileSystem FS;
 
