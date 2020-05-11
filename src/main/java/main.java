@@ -7,6 +7,5 @@ public class main {
 //        CameraConsumer consumer = new CameraConsumer("test", "earliest", "false");
 //        consumer.runConsumer();
 
-
     }
 }
