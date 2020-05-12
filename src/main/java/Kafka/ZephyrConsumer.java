@@ -12,16 +12,12 @@ import java.time.format.DateTimeFormatter;
 
 public class ZephyrConsumer extends AbstractConsumer {
 
-    private static final String TOPIC = "test";
+    private static final String TOPIC = "Zephyr";
     private static final String FILEPATH = "/user/hdfs/Zephyr/";
     private static final String FILENAME = "test";
 
     public ZephyrConsumer(String group_id, String offset_reset, String auto_commit) {
-        super(group_id, offset_reset, auto_commit);
-    }
-
-    public void runConsumer() throws IOException {
-        super.runConsumer(TOPIC, FILEPATH, FILENAME);
+        super(TOPIC, FILEPATH, FILENAME, group_id, offset_reset, auto_commit);
     }
 
     @Override
@@ -34,14 +30,14 @@ public class ZephyrConsumer extends AbstractConsumer {
         FSDataOutputStream outputStream_General = csv_writer.createFileAndOutputStream(filepath, filename + "-General-" + formatter.format(date) + ".csv");
 
         // While we're still at today
-        while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), 23, 59))) {
-            ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(100));
+        while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), date.getHour(), date.getMinute() + 1))) {
+            ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(1000));
             for (ConsumerRecord<String, String> record : records) {
                 switch (record.key()) {
                     case "BR_RR":
-                    csv_writer.writeLineIntoOutputStream(record.value(), outputStream_BR_RR);
-                    this.consumer.commitSync();
-                    break;
+                        csv_writer.writeLineIntoOutputStream(record.value(), outputStream_BR_RR);
+                        this.consumer.commitSync();
+                        break;
                     case "ECG":
                         csv_writer.writeLineIntoOutputStream(record.value(), outputStream_ECG);
                         this.consumer.commitSync();

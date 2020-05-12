@@ -12,12 +12,12 @@ import java.time.format.DateTimeFormatter;
 
 public class EmpaticaConsumer extends AbstractConsumer {
 
-    private static final String TOPIC = "test";
-    private static final String FILEPATH = "/user/hdfs/test/";
+    private static final String TOPIC = "Empatica";
+    private static final String FILEPATH = "/user/hdfs/Empatica/";
     private static final String FILENAME = "test";
 
     public EmpaticaConsumer(String group_id, String offset_reset, String auto_commit){
-        super(group_id,offset_reset,auto_commit);
+        super(TOPIC,FILEPATH, FILENAME, group_id, offset_reset, auto_commit);
     }
 
     @Override

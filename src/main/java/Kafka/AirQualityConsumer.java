@@ -12,16 +12,12 @@ import java.time.format.DateTimeFormatter;
 
 public class AirQualityConsumer extends AbstractConsumer {
 
-    private static final String TOPIC = "test";
+    private static final String TOPIC = "AirQuality";
     private static final String FILEPATH = "/user/hdfs/AirQuality/";
     private static final String FILENAME = "test";
 
     protected AirQualityConsumer(String group_id, String offset_reset, String auto_commit) {
-        super(group_id, offset_reset, auto_commit);
-    }
-
-    public void runConsumer() throws IOException {
-        super.runConsumer(TOPIC, FILEPATH, FILENAME);
+        super(TOPIC,FILEPATH, FILENAME, group_id, offset_reset, auto_commit);
     }
 
     @Override

@@ -6,21 +6,22 @@ import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Properties;
 
-public class AbstractConsumer {
+public abstract class AbstractConsumer implements Runnable {
 
     private final static String BOOTSTRAP_SERVERS = "quickstart.cloudera:9092";
     protected final Consumer<String, String> consumer;
+    protected String topic, filepath, filename;
 
-    protected AbstractConsumer(String group_id, String offset_reset, String auto_commit) {
+    protected AbstractConsumer(String topic, String filepath, String filename, String group_id, String offset_reset, String auto_commit) {
+        this.topic = topic;
+        this.filename = filename;
+        this.filepath = filepath;
         final Properties props = new Properties();
         props.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
         props.setProperty(ConsumerConfig.GROUP_ID_CONFIG, group_id);
@@ -32,7 +33,15 @@ public class AbstractConsumer {
         this.consumer = new KafkaConsumer<>(props);
     }
 
-    protected void runConsumer(String topic, String filepath, String filename) throws IOException {
+    public void run() {
+        try {
+            this.runConsumer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void runConsumer() throws IOException {
         this.consumer.subscribe(Collections.singletonList(topic));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -42,7 +51,7 @@ public class AbstractConsumer {
             // Init Date
             LocalDateTime date = LocalDateTime.now();
 
-            this.storeData(csv_writer,filepath,filename,formatter,date);
+            this.storeData(csv_writer, filepath, filename, formatter, date);
 
             csv_writer.closeFileSystem();
             System.out.println("Done");
@@ -54,10 +63,8 @@ public class AbstractConsumer {
         FSDataOutputStream outputStream = csv_writer.createFileAndOutputStream(filepath,
                 filename + formatter.format(date) + ".csv");
         // While we're still at today
-        while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), 23, 59)))
-        {break;}
-        while ((outputStream.size() / 1024) / 1024 < 5) {
-            ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(100));
+        while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), date.getHour(), date.getMinute() + 1))) {
+            ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(1000));
             for (ConsumerRecord<String, String> record : records) {
                 csv_writer.writeLineIntoOutputStream(record.value(), outputStream);
                 this.consumer.commitSync();
