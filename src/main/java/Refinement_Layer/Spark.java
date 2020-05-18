@@ -3,7 +3,9 @@ package Refinement_Layer;
 
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.*;
+
 import java.util.*;
+
 import org.apache.spark.SparkConf;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -12,7 +14,7 @@ import org.apache.spark.streaming.kafka010.*;
 
 public class Spark {
 
-    public Spark(){
+    public Spark() {
 
         SparkConf conf = new SparkConf().setAppName("appName").setMaster("yarn");
         JavaStreamingContext ssc = new JavaStreamingContext(conf, new Duration(5000));
@@ -21,7 +23,7 @@ public class Spark {
         kafkaParams.put("bootstrap.servers", "quickstart.cloudera:9092");
         kafkaParams.put("key.deserializer", StringDeserializer.class);
         kafkaParams.put("value.deserializer", StringDeserializer.class);
-        kafkaParams.put("group.id", "test");
+        kafkaParams.put("group.id", "g25");
         kafkaParams.put("auto.offset.reset", "earliest");
         kafkaParams.put("enable.auto.commit", false);
 
@@ -33,7 +35,13 @@ public class Spark {
                 ConsumerStrategies.<String, String>Subscribe(topics, kafkaParams)
         );
 
-        stream.mapToPair(record -> new Tuple2<>(record.key(), record.value()));
+        JavaPairDStream<String, String> result = stream.mapToPair(record -> new Tuple2<>(record.key(), record.value()));
+
+        result.foreachRDD(rdd -> {
+            List<Tuple2<String, String>> res = rdd.collect();
+            System.out.println("SIZEEEEEEEEEE" + res.size());
+        });
+
     }
 
 
