@@ -1,4 +1,4 @@
-package Kafka;
+package Acquisition_Layer.Kafka;
 
 import Hdfs.HdfsWriter;
 import org.apache.hadoop.fs.FSDataOutputStream;

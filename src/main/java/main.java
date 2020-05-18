@@ -1,5 +1,8 @@
-import Kafka.AwConsumer;
-import Kafka.ZephyrConsumer;
+import Acquisition_Layer.Kafka.AwConsumer;
+import Acquisition_Layer.Kafka.CameraConsumer;
+import Acquisition_Layer.Kafka.EmpaticaConsumer;
+import Acquisition_Layer.Kafka.ZephyrConsumer;
+import Refinement_Layer.Spark;
 
 import java.io.IOException;
 
@@ -7,16 +10,6 @@ public class main {
     public static void main(String[] args) throws InterruptedException, IOException {
 
 
-//        CameraConsumer consumer = new CameraConsumer("test", "earliest", "false");
-//        consumer.runConsumer();
-        AwConsumer awConsumer = new AwConsumer("Aw", "earliest","false");
-        ZephyrConsumer zephyrConsumer = new ZephyrConsumer("Zephyr", "earliest", "false");
-
-        Thread aw = new Thread(awConsumer);
-        Thread zephyr = new Thread(zephyrConsumer);
-
-        aw.start();
-        zephyr.start();
-
+        Spark spark = new Spark();
     }
 }

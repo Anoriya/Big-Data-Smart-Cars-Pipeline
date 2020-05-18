@@ -1,4 +1,4 @@
-package Kafka;
+package Acquisition_Layer.Kafka;
 
 import Hdfs.HdfsWriter;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -16,8 +16,8 @@ public class EmpaticaConsumer extends AbstractConsumer {
     private static final String FILEPATH = "/user/hdfs/Empatica/";
     private static final String FILENAME = "test";
 
-    public EmpaticaConsumer(String group_id, String offset_reset, String auto_commit){
-        super(TOPIC,FILEPATH, FILENAME, group_id, offset_reset, auto_commit);
+    public EmpaticaConsumer(String group_id, String offset_reset, String auto_commit) {
+        super(TOPIC, FILEPATH, FILENAME, group_id, offset_reset, auto_commit);
     }
 
     @Override
@@ -45,41 +45,40 @@ public class EmpaticaConsumer extends AbstractConsumer {
                 "TEMP" + formatter.format(date) + ".csv");
 
         // While we're still at today
-        while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), 23, 59)))
-        {
-            ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(100));
+        while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), date.getHour(), date.getMinute() + 1))) {
+            ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(1000));
             for (ConsumerRecord<String, String> record : records) {
-                switch(record.key()){
-                    case ("ACC"):
+                System.out.println(record.key());
+                switch (record.key()) {
+                    case "ACC":
                         csv_writer.writeLineIntoOutputStream(record.value(), outputStreamACC);
                         this.consumer.commitSync();
                         break;
-                    case("BVP"):
+                    case "BVP":
                         csv_writer.writeLineIntoOutputStream(record.value(), outputStreamBVP);
                         this.consumer.commitSync();
                         break;
-                    case("EDA"):
+                    case "EDA":
                         csv_writer.writeLineIntoOutputStream(record.value(), outputStreamEDA);
                         this.consumer.commitSync();
                         break;
-                    case("HR"):
+                    case "HR":
                         csv_writer.writeLineIntoOutputStream(record.value(), outputStreamHR);
                         this.consumer.commitSync();
                         break;
-                    case("IBI"):
-                        csv_writer.writeLineIntoOutputStream(record.value(), outputStreamIBI);
-                        this.consumer.commitSync();
-                        break;
-                    case("TAGS"):
-                        csv_writer.writeLineIntoOutputStream(record.value(), outputStreamTAGS);
-                        this.consumer.commitSync();
-                        break;
-                    case("TEMP"):
+                    case "TEMP":
                         csv_writer.writeLineIntoOutputStream(record.value(), outputStreamTEMP);
                         this.consumer.commitSync();
                         break;
+                    case "IBI":
+                        csv_writer.writeLineIntoOutputStream(record.value(), outputStreamIBI);
+                        this.consumer.commitSync();
+                        break;
+                    case "TAGS":
+                        csv_writer.writeLineIntoOutputStream(record.value(), outputStreamTAGS);
+                        this.consumer.commitSync();
+                        break;
                 }
-
             }
         }
         outputStreamACC.close();
@@ -89,8 +88,6 @@ public class EmpaticaConsumer extends AbstractConsumer {
         outputStreamIBI.close();
         outputStreamTAGS.close();
         outputStreamTEMP.close();
-
-
 
 
     }

@@ -1,7 +1,5 @@
-package Kafka;
+package Acquisition_Layer.Kafka;
 
-
-import java.io.IOException;
 
 public class CameraConsumer extends AbstractConsumer{
 
