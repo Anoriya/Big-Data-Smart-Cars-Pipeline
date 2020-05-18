@@ -1,7 +1,3 @@
-import Acquisition_Layer.Kafka.AwConsumer;
-import Acquisition_Layer.Kafka.CameraConsumer;
-import Acquisition_Layer.Kafka.EmpaticaConsumer;
-import Acquisition_Layer.Kafka.ZephyrConsumer;
 import Refinement_Layer.Spark;
 
 import java.io.IOException;
