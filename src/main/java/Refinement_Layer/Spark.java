@@ -9,12 +9,11 @@ import java.util.*;
 import org.apache.spark.SparkConf;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import scala.Tuple2;
 import org.apache.spark.streaming.kafka010.*;
 
 public class Spark {
 
-    public Spark() {
+    public Spark() throws InterruptedException {
 
         SparkConf conf = new SparkConf().setAppName("appName").setMaster("yarn");
         JavaStreamingContext ssc = new JavaStreamingContext(conf, new Duration(5000));
@@ -27,20 +26,20 @@ public class Spark {
         kafkaParams.put("auto.offset.reset", "earliest");
         kafkaParams.put("enable.auto.commit", false);
 
-        Collection<String> topics = Collections.singletonList("test");
+        Collection<String> topics = Arrays.asList("test", "camera");
 
-        JavaInputDStream<ConsumerRecord<String, String>> stream = KafkaUtils.createDirectStream(
+        JavaInputDStream<ConsumerRecord<String, String>> messages = KafkaUtils.createDirectStream(
                 ssc,
-                LocationStrategies.PreferBrokers(),
+                LocationStrategies.PreferConsistent(),
                 ConsumerStrategies.<String, String>Subscribe(topics, kafkaParams)
         );
 
-        JavaPairDStream<String, String> result = stream.mapToPair(record -> new Tuple2<>(record.key(), record.value()));
+        JavaDStream<String> lines = messages.map(ConsumerRecord::value);
+        lines.print();
 
-        result.foreachRDD(rdd -> {
-            List<Tuple2<String, String>> res = rdd.collect();
-            System.out.println("SIZEEEEEEEEEE" + res.size());
-        });
+        // Start the computation
+        ssc.start();
+        ssc.awaitTermination();
 
     }
 
