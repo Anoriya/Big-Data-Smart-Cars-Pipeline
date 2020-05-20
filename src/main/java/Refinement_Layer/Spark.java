@@ -15,7 +15,7 @@ public class Spark {
 
     public Spark() throws InterruptedException {
 
-        SparkConf conf = new SparkConf().setAppName("appName").setMaster("yarn");
+        SparkConf conf = new SparkConf().setAppName("appName");
         JavaStreamingContext ssc = new JavaStreamingContext(conf, new Duration(5000));
 
         Map<String, Object> kafkaParams = new HashMap<>();
