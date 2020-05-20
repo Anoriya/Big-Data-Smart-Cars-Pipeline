@@ -10,6 +10,7 @@ import org.apache.spark.SparkConf;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.spark.streaming.kafka010.*;
+import scala.Tuple3;
 
 public class Spark {
 
@@ -28,14 +29,20 @@ public class Spark {
 
         Collection<String> topics = Arrays.asList("test", "camera");
 
-        JavaInputDStream<ConsumerRecord<String, String>> messages = KafkaUtils.createDirectStream(
+        JavaInputDStream<ConsumerRecord<String, String>> stream = KafkaUtils.createDirectStream(
                 ssc,
                 LocationStrategies.PreferConsistent(),
                 ConsumerStrategies.<String, String>Subscribe(topics, kafkaParams)
         );
 
-        JavaDStream<String> lines = messages.map(ConsumerRecord::value);
-        lines.print();
+        JavaDStream<Tuple3<String, Long, Long>> lines = stream.map(line -> new Tuple3<>(line.topic(),line.timestamp(),line.offset()));
+
+
+        lines.foreachRDD(rdd -> {
+            rdd.foreachPartition(System.out::println);
+        });
+
+
 
         // Start the computation
         ssc.start();
