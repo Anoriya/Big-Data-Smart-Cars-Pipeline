@@ -31,7 +31,7 @@ public class ZephyrConsumer extends AbstractConsumer {
 
         // While we're still at today
         while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), date.getHour(), date.getMinute() + 1))) {
-            ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(1000));
+            ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(2000));
             for (ConsumerRecord<String, String> record : records) {
                 System.out.println(record.key());
                 switch (record.key()) {
