@@ -57,7 +57,6 @@ public class Spark {
                     //Number of the records, will be used for average
                     AtomicReference<Double> size = new AtomicReference<>((double) 1);
                     String[] somme = first._2;
-                    //Double[] moyenne = new Double[somme.length];
                     Double[] moyenne;
 
                     if (topic.equals("Empatica")) {
@@ -76,45 +75,38 @@ public class Spark {
                         } else if (key.equals("IBI")) {
                             //Get the value for which heartbeat duration is the longest
                             try {
-                                AtomicReference<Tuple2<Double, Double>> max = new AtomicReference<>(new Tuple2<>(Double.parseDouble(first._2[0]), Double.parseDouble(first._2[1])));
-                                records.forEachRemaining(record -> {
-                                    if (Double.parseDouble(record._2[1]) > max.get()._2) {
-                                        max.set(new Tuple2<>(Double.parseDouble(record._2[0]), Double.parseDouble(record._2[1])));
-                                    }
-                                });
-                                IBI_Vector.addAll(Arrays.asList(max.get()._1, max.get()._2));
+                                Tuple2<Double, Double> max = SparkUtils.maxHeartbeat.call(first._2, records);
+                                IBI_Vector.addAll(Arrays.asList(max._1, max._2));
                             } catch (Exception e) {
                                 IBI_Vector.addAll(Arrays.asList(0.0, 0.0));
                             }
                             System.out.println("IBI : " + IBI_Vector);
 
                         } else {
-                            AtomicReference<Double> sum = new AtomicReference<Double>(Double.parseDouble(first._2[0]));
                             records.forEachRemaining(record -> {
                                 try {
-                                    sum.updateAndGet(v -> v + Double.parseDouble(record._2[0]));
-                                    size.getAndSet((size.get() + 1));
+                                    SparkUtils.sum.call(somme, record._2, size,0);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             });
                             //Calculate average of all columns
-                            double moyennez = sum.get() / size.get();
+                            moyenne = SparkUtils.moyenne.call(somme,size,0);
                             switch (key) {
                                 case "BVP":
-                                    BVP_Vector.add(moyennez);
+                                    BVP_Vector.addAll(Arrays.asList(moyenne));
                                     System.out.println("BVP : " + BVP_Vector);
                                     break;
                                 case "EDA":
-                                    EDA_Vector.add(moyennez);
+                                    EDA_Vector.addAll(Arrays.asList(moyenne));
                                     System.out.println("EDA : " + EDA_Vector);
                                     break;
                                 case "HR":
-                                    HR_Vector.add(moyennez);
+                                    HR_Vector.addAll(Arrays.asList(moyenne));
                                     System.out.println("HR : " + HR_Vector);
                                     break;
                                 case "TEMP":
-                                    TEMP_Vector.add(moyennez);
+                                    TEMP_Vector.addAll(Arrays.asList(moyenne));
                                     System.out.println("TEMP : " + TEMP_Vector);
                                     break;
                             }
@@ -143,16 +135,6 @@ public class Spark {
 
 }
 
-//        private Tuple2<Double, Double> getMaximumHeartbeat (String[]first, Iterator < Tuple2 < String, String[]>>records) throws
-//        Exception {
-//            AtomicReference<Tuple2<Double, Double>> max = new AtomicReference<>(new Tuple2<>(Double.parseDouble(first[0]), Double.parseDouble(first[1])));
-//            records.forEachRemaining(record -> {
-//                if (Double.parseDouble(record._2[1]) > max.get()._2) {
-//                    max.set(new Tuple2<>(Double.parseDouble(record._2[0]), Double.parseDouble(record._2[1])));
-//                }
-//            });
-//            return max.get();
-//        }
 
 
 

@@ -4,8 +4,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.Function3;
 import org.apache.spark.api.java.function.Function4;
+import scala.Tuple2;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SparkUtils implements Serializable {
@@ -37,6 +39,19 @@ public class SparkUtils implements Serializable {
                 }
             }
             return moyenne;
+        }
+    };
+
+    final static Function2<String[], Iterator<Tuple2< String, String[]>>,Tuple2<Double,Double>> maxHeartbeat = new Function2<String[], Iterator<Tuple2<String, String[]>>, Tuple2<Double, Double>>() {
+        @Override
+        public Tuple2<Double, Double> call(String[] first, Iterator<Tuple2<String, String[]>> records) throws Exception {
+            AtomicReference<Tuple2<Double, Double>> max = new AtomicReference<>(new Tuple2<>(Double.parseDouble(first[0]), Double.parseDouble(first[1])));
+            records.forEachRemaining(record -> {
+                if (Double.parseDouble(record._2[1]) > max.get()._2) {
+                    max.set(new Tuple2<>(Double.parseDouble(record._2[0]), Double.parseDouble(record._2[1])));
+                }
+            });
+            return max.get();
         }
     };
 }
