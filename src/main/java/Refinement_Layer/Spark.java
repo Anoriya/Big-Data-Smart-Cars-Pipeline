@@ -149,14 +149,11 @@ public class Spark {
                     else if(key.equals("General"))
                     {
                         records.forEachRemaining(record -> {
-                            try {
-                                SparkUtils.sum.call(somme, record._2, size,1);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                                //Removes the timestamp attribute
+                                String[] nonTimedRecord = Arrays.copyOfRange(record._2, 1, record._2.length);
+                                Double[] convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
+                                GENERAL_Vector.addAll(Arrays.asList(convertedArray));
                         });
-                        moyenne = SparkUtils.moyenne.call(somme,size,1);
-                        GENERAL_Vector.addAll(Arrays.asList(moyenne));
                         System.out.println("GENERAL : " + GENERAL_Vector);
                     }
                         else if(key.equals("Event_Data"))
@@ -169,6 +166,7 @@ public class Spark {
                                     e.printStackTrace();
                                 }
                             });
+                            System.out.println("Event Data : " + EVEN_DATA_Vector);
                         }
                 }
                      else if(topic.equals("Aw"))
