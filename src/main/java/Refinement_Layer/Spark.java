@@ -45,6 +45,10 @@ public class Spark {
         List<Double> HR_Vector = new ArrayList<Double>();
         List<Double> TEMP_Vector = new ArrayList<Double>();
         List<Double> BVP_Vector = new ArrayList<Double>();
+        List<Double> BR_RR_Vector = new ArrayList<Double>();
+        List<Double> ECG_Vector = new ArrayList<Double>();
+        List<Double> GENERAL_Vector = new ArrayList<Double>();
+        List<Double> EVEN_DATA_Vector = new ArrayList<Double>();
 
 
         topic_value.foreachRDD(rdd -> {
@@ -112,11 +116,64 @@ public class Spark {
                             }
                         }
                     }
+
                     else if(topic.equals("Zephyre")){
                         if(key.equals("BR_RR"))
                         {
-
+                            records.forEachRemaining(record -> {
+                                try {
+                                    SparkUtils.sum.call(somme, record._2, size,1);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                            moyenne = SparkUtils.moyenne.call(somme,size,1);
+                            ACC_Vector.addAll(Arrays.asList(moyenne));
+                            System.out.println("BR_RR : " + BR_RR_Vector);
                         }
+
+                    else if(key.equals("ECG"))
+                    {
+                        records.forEachRemaining(record -> {
+                            try {
+                                SparkUtils.sum.call(somme, record._2, size,1);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        moyenne = SparkUtils.moyenne.call(somme,size,1);
+                        ACC_Vector.addAll(Arrays.asList(moyenne));
+                        System.out.println("ECG : " + ECG_Vector);
+                    }
+                    else if(key.equals("GENERAL"))
+                    {
+                        records.forEachRemaining(record -> {
+                            try {
+                                SparkUtils.sum.call(somme, record._2, size,1);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        moyenne = SparkUtils.moyenne.call(somme,size,1);
+                        ACC_Vector.addAll(Arrays.asList(moyenne));
+                        System.out.println("GENERAL : " + GENERAL_Vector);
+                    }
+                        else if(key.equals("EVENT_DATA"))
+                        {
+                        }
+                }
+                    else if(topic.equals("Aw"))
+                    {
+                        records.forEachRemaining(record -> {
+                            try {
+                                SparkUtils.sum.call(somme, record._2, size,8);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        moyenne = SparkUtils.moyenne.call(somme,size,8);
+                        ACC_Vector.addAll(Arrays.asList(moyenne));
+                        System.out.println("ECG : " + ECG_Vector);
                     }
 
 
