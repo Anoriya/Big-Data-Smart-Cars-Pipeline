@@ -189,7 +189,8 @@ public class Spark {
                         //Because AW sensors always send one more empty column
                         records.forEachRemaining(record -> {
                             try {
-                                CAMERA_VECTOR.add(record._2);
+                                if((record._2[2]=="PROCESSED")&&(record._2[3]=="WORKING")&&(record._2[4]=="True"))
+                                    CAMERA_VECTOR.add(Arrays.copyOfRange(record._2, 5, record._2.length));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
