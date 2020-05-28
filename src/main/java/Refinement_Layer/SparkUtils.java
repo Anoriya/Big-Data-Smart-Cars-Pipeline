@@ -30,7 +30,7 @@ public class SparkUtils implements Serializable {
     final static Function3<String[], AtomicReference<Double>, Integer, Double[]> moyenne = new Function3<String[], AtomicReference<Double>, Integer, Double[]>() {
         @Override
         public Double[] call(String[] somme, AtomicReference<Double> size, Integer start) throws Exception {
-            Double[] moyenne = new Double[somme.length];
+            Double[] moyenne = new Double[somme.length - start];
             for (int i = start; i < somme.length; i++) {
                 try {
                     moyenne[i-start] = (Double.parseDouble(somme[i]) / size.get());

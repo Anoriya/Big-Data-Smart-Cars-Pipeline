@@ -117,7 +117,7 @@ public class Spark {
                         }
                     }
 
-                    else if(topic.equals("Zephyre")){
+                   /* else if(topic.equals("Zephyr")){
                         if(key.equals("BR_RR"))
                         {
                             records.forEachRemaining(record -> {
@@ -145,7 +145,7 @@ public class Spark {
                         ACC_Vector.addAll(Arrays.asList(moyenne));
                         System.out.println("ECG : " + ECG_Vector);
                     }
-                    else if(key.equals("GENERAL"))
+                    else if(key.equals("General"))
                     {
                         records.forEachRemaining(record -> {
                             try {
@@ -161,8 +161,8 @@ public class Spark {
                         else if(key.equals("EVENT_DATA"))
                         {
                         }
-                }
-                    else if(topic.equals("Aw"))
+                } */
+                    /* else if(topic.equals("Aw"))
                     {
                         records.forEachRemaining(record -> {
                             try {
@@ -174,7 +174,7 @@ public class Spark {
                         moyenne = SparkUtils.moyenne.call(somme,size,8);
                         ACC_Vector.addAll(Arrays.asList(moyenne));
                         System.out.println("ECG : " + ECG_Vector);
-                    }
+                    } */
 
 
                 } catch (NoSuchElementException e) {
