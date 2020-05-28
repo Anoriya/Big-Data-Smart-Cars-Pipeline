@@ -50,7 +50,7 @@ public class Spark {
         List<Double> GENERAL_Vector = new ArrayList<Double>();
         List<String> EVEN_DATA_Vector = new ArrayList<String>();
         List<Double> AW_VECTOR = new ArrayList<Double>();
-
+        List<String[]> CAMERA_VECTOR = new ArrayList<String[]>();
 
         topic_value.foreachRDD(rdd -> {
             rdd.foreachPartition(records -> {
@@ -162,8 +162,12 @@ public class Spark {
                         else if(key.equals("Event_Data"))
                         {
                             records.forEachRemaining(record -> {
+                                try{
                                 String [] newRecord = Arrays.copyOfRange(record._2, 5, record._2.length);
-                                EVEN_DATA_Vector.addAll(Arrays.asList(newRecord));
+                                EVEN_DATA_Vector.addAll(Arrays.asList(newRecord));}
+                                catch(Exception e){
+                                    e.printStackTrace();
+                                }
                             });
                         }
                 }
@@ -181,6 +185,18 @@ public class Spark {
                         moyenne = SparkUtils.moyenne.call(finalSomme,size,8);
                         AW_VECTOR.addAll(Arrays.asList(moyenne));
                         System.out.println("AW : " + AW_VECTOR);
+                    }
+                    else if(topic.equals("Camera"))
+                    {
+                        //Because AW sensors always send one more empty column
+                        records.forEachRemaining(record -> {
+                            try {
+                                CAMERA_VECTOR.add(record._2);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        System.out.println("Camera : " + CAMERA_VECTOR);
                     }
 
 
