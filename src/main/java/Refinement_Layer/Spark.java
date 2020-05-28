@@ -149,10 +149,14 @@ public class Spark {
                     else if(key.equals("General"))
                     {
                         records.forEachRemaining(record -> {
+                            try {
                                 //Removes the timestamp attribute
                                 String[] nonTimedRecord = Arrays.copyOfRange(record._2, 1, record._2.length);
                                 Double[] convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
-                                GENERAL_Vector.addAll(Arrays.asList(convertedArray));
+                                GENERAL_Vector.addAll(Arrays.asList(convertedArray));}
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
                         });
                         System.out.println("GENERAL : " + GENERAL_Vector);
                     }
@@ -189,7 +193,7 @@ public class Spark {
                         //Because AW sensors always send one more empty column
                         records.forEachRemaining(record -> {
                             try {
-                                if((record._2[2]=="PROCESSED")&&(record._2[3]=="WORKING")&&(record._2[4]=="True"))
+                                if((record._2[2].equals("PROCESSED"))&&(record._2[3].equals("WORKING"))&&(record._2[4].equals("True")))
                                     CAMERA_VECTOR.add(Arrays.copyOfRange(record._2, 5, record._2.length));
                             } catch (Exception e) {
                                 e.printStackTrace();
