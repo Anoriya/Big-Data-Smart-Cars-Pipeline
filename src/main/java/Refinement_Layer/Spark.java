@@ -48,7 +48,7 @@ public class Spark {
         List<Double> BR_RR_Vector = new ArrayList<Double>();
         List<Double> ECG_Vector = new ArrayList<Double>();
         List<Double> GENERAL_Vector = new ArrayList<Double>();
-        List<String> EVEN_DATA_Vector = new ArrayList<String>();
+        List<String> EVENT_DATA_Vector = new ArrayList<String>();
         List<Double> AW_VECTOR = new ArrayList<Double>();
         List<String[]> CAMERA_VECTOR = new ArrayList<String[]>();
 
@@ -150,6 +150,7 @@ public class Spark {
                     {
                         records.forEachRemaining(record -> {
                             try {
+                                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA " + record._2[0]);
                                 //Removes the timestamp attribute
                                 String[] nonTimedRecord = Arrays.copyOfRange(record._2, 1, record._2.length);
                                 Double[] convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
@@ -163,14 +164,15 @@ public class Spark {
                         else if(key.equals("Event_Data"))
                         {
                             records.forEachRemaining(record -> {
+                                System.out.println("BBBBBBBBBBBBBBBBBBBBBBBB " + record._2[0]);
                                 try{
                                 String [] newRecord = Arrays.copyOfRange(record._2, 5, record._2.length);
-                                EVEN_DATA_Vector.addAll(Arrays.asList(newRecord));}
+                                EVENT_DATA_Vector.addAll(Arrays.asList(newRecord));}
                                 catch(Exception e){
                                     e.printStackTrace();
                                 }
                             });
-                            System.out.println("Event Data : " + EVEN_DATA_Vector);
+                            System.out.println("Event Data : " + EVENT_DATA_Vector);
                         }
                 }
                      else if(topic.equals("Aw"))
@@ -199,11 +201,19 @@ public class Spark {
                                 e.printStackTrace();
                             }
                         });
-                        System.out.println("Camera : " + CAMERA_VECTOR);
+                        String[] string = new String[1];
+                        string[0] = "[";
+                        CAMERA_VECTOR.forEach(array -> {
+                            for (String s : array) {
+                                string[0] += s + ",";
+                            }
+                            string[0]+="]\n[";
+                        });
+                        System.out.println("Camera : " + string[0]);
                     }
 
 
-                } catch (NoSuchElementException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             });
