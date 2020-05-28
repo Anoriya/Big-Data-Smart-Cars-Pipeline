@@ -57,25 +57,19 @@ public class Spark {
                     //Number of the records, will be used for average
                     AtomicReference<Double> size = new AtomicReference<>((double) 1);
                     String[] somme = first._2;
-                    Double[] moyenne = new Double[somme.length];
+                    //Double[] moyenne = new Double[somme.length];
+                    Double[] moyenne;
 
                     if (topic.equals("Empatica")) {
                         if (key.equals("ACC")) {
                             records.forEachRemaining(record -> {
                                 try {
                                     SparkUtils.sum.call(somme, record._2, size);
-                                    System.out.println("SIZEEEEEEEEEEEEEEEE : " + size);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             });
-                            for (int i = 0; i < somme.length; i++) {
-                                try {
-                                    moyenne[i] = (Double.parseDouble(somme[i]) / size.get());
-                                } catch (NullPointerException | NumberFormatException e) {
-                                    moyenne[i] = 0.0;
-                                }
-                            }
+                            moyenne = SparkUtils.moyenne.call(somme,size);
                             ACC_Vector.addAll(Arrays.asList(moyenne));
                             System.out.println("ACC : " + ACC_Vector);
 
@@ -124,6 +118,12 @@ public class Spark {
                                     System.out.println("TEMP : " + TEMP_Vector);
                                     break;
                             }
+                        }
+                    }
+                    else if(topic.equals("Zephyre")){
+                        if(key.equals("BR_RR"))
+                        {
+
                         }
                     }
 
