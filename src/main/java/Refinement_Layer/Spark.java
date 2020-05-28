@@ -64,12 +64,12 @@ public class Spark {
                         if (key.equals("ACC")) {
                             records.forEachRemaining(record -> {
                                 try {
-                                    SparkUtils.sum.call(somme, record._2, size);
+                                    SparkUtils.sum.call(somme, record._2, size,0);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             });
-                            moyenne = SparkUtils.moyenne.call(somme,size);
+                            moyenne = SparkUtils.moyenne.call(somme,size,0);
                             ACC_Vector.addAll(Arrays.asList(moyenne));
                             System.out.println("ACC : " + ACC_Vector);
 
