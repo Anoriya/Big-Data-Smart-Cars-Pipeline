@@ -48,7 +48,8 @@ public class Spark {
         List<Double> BR_RR_Vector = new ArrayList<Double>();
         List<Double> ECG_Vector = new ArrayList<Double>();
         List<Double> GENERAL_Vector = new ArrayList<Double>();
-        List<Double> EVEN_DATA_Vector = new ArrayList<Double>();
+        List<String> EVEN_DATA_Vector = new ArrayList<String>();
+        List<Double> AW_VECTOR = new ArrayList<Double>();
 
 
         topic_value.foreachRDD(rdd -> {
@@ -117,7 +118,7 @@ public class Spark {
                         }
                     }
 
-                   /* else if(topic.equals("Zephyr")){
+                    else if(topic.equals("Zephyr")){
                         if(key.equals("BR_RR"))
                         {
                             records.forEachRemaining(record -> {
@@ -128,7 +129,7 @@ public class Spark {
                                 }
                             });
                             moyenne = SparkUtils.moyenne.call(somme,size,1);
-                            ACC_Vector.addAll(Arrays.asList(moyenne));
+                            BR_RR_Vector.addAll(Arrays.asList(moyenne));
                             System.out.println("BR_RR : " + BR_RR_Vector);
                         }
 
@@ -142,7 +143,7 @@ public class Spark {
                             }
                         });
                         moyenne = SparkUtils.moyenne.call(somme,size,1);
-                        ACC_Vector.addAll(Arrays.asList(moyenne));
+                        ECG_Vector.addAll(Arrays.asList(moyenne));
                         System.out.println("ECG : " + ECG_Vector);
                     }
                     else if(key.equals("General"))
@@ -155,26 +156,32 @@ public class Spark {
                             }
                         });
                         moyenne = SparkUtils.moyenne.call(somme,size,1);
-                        ACC_Vector.addAll(Arrays.asList(moyenne));
+                        GENERAL_Vector.addAll(Arrays.asList(moyenne));
                         System.out.println("GENERAL : " + GENERAL_Vector);
                     }
-                        else if(key.equals("EVENT_DATA"))
+                        else if(key.equals("Event_Data"))
                         {
+                            records.forEachRemaining(record -> {
+                                String [] newRecord = Arrays.copyOfRange(record._2, 5, record._2.length);
+                                EVEN_DATA_Vector.addAll(Arrays.asList(newRecord));
+                            });
                         }
-                } */
-                    /* else if(topic.equals("Aw"))
+                }
+                     else if(topic.equals("Aw"))
                     {
+                        //Because AW sensors always send one more empty column
+                        String[] finalSomme = Arrays.copyOf(somme, somme.length - 1);
                         records.forEachRemaining(record -> {
                             try {
-                                SparkUtils.sum.call(somme, record._2, size,8);
+                                SparkUtils.sum.call(finalSomme, record._2, size,8);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         });
-                        moyenne = SparkUtils.moyenne.call(somme,size,8);
-                        ACC_Vector.addAll(Arrays.asList(moyenne));
-                        System.out.println("ECG : " + ECG_Vector);
-                    } */
+                        moyenne = SparkUtils.moyenne.call(finalSomme,size,8);
+                        AW_VECTOR.addAll(Arrays.asList(moyenne));
+                        System.out.println("AW : " + AW_VECTOR);
+                    }
 
 
                 } catch (NoSuchElementException e) {

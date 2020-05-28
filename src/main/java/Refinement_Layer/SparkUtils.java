@@ -19,7 +19,7 @@ public class SparkUtils implements Serializable {
                 try {
                     somme[i] = String.valueOf((Double.parseDouble(somme[i]) + Double.parseDouble(record[i])));
                 } catch (NullPointerException | NumberFormatException e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
             size.getAndSet((size.get() + 1));
