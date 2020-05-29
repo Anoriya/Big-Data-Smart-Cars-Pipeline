@@ -154,6 +154,7 @@ public class Spark {
                                 //Removes the timestamp attribute
                                 String[] nonTimedRecord = Arrays.copyOfRange(record._2, 1, record._2.length);
                                 Double[] convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
+                                GENERAL_Vector.clear();
                                 GENERAL_Vector.addAll(Arrays.asList(convertedArray));}
                             catch (Exception e){
                                 e.printStackTrace();
@@ -167,6 +168,7 @@ public class Spark {
                                 System.out.println("BBBBBBBBBBBBBBBBBBBBBBBB " + record._2[0]);
                                 try{
                                 String [] newRecord = Arrays.copyOfRange(record._2, 5, record._2.length);
+                                EVENT_DATA_Vector.clear();
                                 EVENT_DATA_Vector.addAll(Arrays.asList(newRecord));}
                                 catch(Exception e){
                                     e.printStackTrace();
