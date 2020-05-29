@@ -12,7 +12,6 @@ import org.apache.spark.streaming.kafka010.*;
 import scala.Tuple2;
 
 
-
 public class Spark {
 
     public Spark() throws InterruptedException {
@@ -68,12 +67,12 @@ public class Spark {
                         if (key.equals("ACC")) {
                             records.forEachRemaining(record -> {
                                 try {
-                                    SparkUtils.sum.call(somme, record._2, size,0);
+                                    SparkUtils.sum.call(somme, record._2, size, 0);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             });
-                            moyenne = SparkUtils.moyenne.call(somme,size,0);
+                            moyenne = SparkUtils.moyenne.call(somme, size, 0);
                             ACC_Vector.addAll(Arrays.asList(moyenne));
                             System.out.println("ACC : " + ACC_Vector);
 
@@ -90,13 +89,13 @@ public class Spark {
                         } else {
                             records.forEachRemaining(record -> {
                                 try {
-                                    SparkUtils.sum.call(somme, record._2, size,0);
+                                    SparkUtils.sum.call(somme, record._2, size, 0);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             });
                             //Calculate average of all columns
-                            moyenne = SparkUtils.moyenne.call(somme,size,0);
+                            moyenne = SparkUtils.moyenne.call(somme, size, 0);
                             switch (key) {
                                 case "BVP":
                                     BVP_Vector.addAll(Arrays.asList(moyenne));
@@ -116,107 +115,83 @@ public class Spark {
                                     break;
                             }
                         }
-                    }
-
-                    else if(topic.equals("Zephyr")){
-                        if(key.equals("BR_RR"))
-                        {
+                    } else if (topic.equals("Zephyr")) {
+                        if (key.equals("BR_RR")) {
                             records.forEachRemaining(record -> {
                                 try {
-                                    SparkUtils.sum.call(somme, record._2, size,1);
+                                    SparkUtils.sum.call(somme, record._2, size, 1);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             });
-                            moyenne = SparkUtils.moyenne.call(somme,size,1);
+                            moyenne = SparkUtils.moyenne.call(somme, size, 1);
                             BR_RR_Vector.addAll(Arrays.asList(moyenne));
                             System.out.println("BR_RR : " + BR_RR_Vector);
-                        }
-
-                    else if(key.equals("ECG"))
-                    {
-                        records.forEachRemaining(record -> {
-                            try {
-                                SparkUtils.sum.call(somme, record._2, size,1);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        });
-                        moyenne = SparkUtils.moyenne.call(somme,size,1);
-                        ECG_Vector.addAll(Arrays.asList(moyenne));
-                        System.out.println("ECG : " + ECG_Vector);
-                    }
-                    else if(key.equals("General"))
-                    {
-                        records.forEachRemaining(record -> {
-                            try {
-                                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA " + record._2[0]);
-                                //Removes the timestamp attribute
-                                String[] nonTimedRecord = Arrays.copyOfRange(record._2, 1, record._2.length);
-                                Double[] convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
-                                GENERAL_Vector.clear();
-                                GENERAL_Vector.addAll(Arrays.asList(convertedArray));}
-                            catch (Exception e){
-                                e.printStackTrace();
-                            }
-                        });
-                        System.out.println("GENERAL : " + GENERAL_Vector);
-                    }
-                        else if(key.equals("Event_Data"))
-                        {
+                        } else if (key.equals("ECG")) {
                             records.forEachRemaining(record -> {
-                                System.out.println("BBBBBBBBBBBBBBBBBBBBBBBB " + record._2[0]);
-                                try{
-                                String [] newRecord = Arrays.copyOfRange(record._2, 5, record._2.length);
-                                EVENT_DATA_Vector.clear();
-                                EVENT_DATA_Vector.addAll(Arrays.asList(newRecord));}
-                                catch(Exception e){
+                                try {
+                                    SparkUtils.sum.call(somme, record._2, size, 1);
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             });
+                            moyenne = SparkUtils.moyenne.call(somme, size, 1);
+                            ECG_Vector.addAll(Arrays.asList(moyenne));
+                            System.out.println("ECG : " + ECG_Vector);
+                        } else if (key.equals("General")) {
+                                try {
+                                    //Removes the timestamp attribute
+                                    String[] nonTimedRecord = Arrays.copyOfRange(first._2, 1, first._2.length);
+                                    Double[] convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
+                                    GENERAL_Vector.addAll(Arrays.asList(convertedArray));
+                                } catch (Exception e) {
+                                    System.out.println("EXCEPTION GENERAL");
+                                }
+                            System.out.println("GENERAL : " + GENERAL_Vector);
+                        } else if (key.equals("Event_Data")) {
+                                try {
+                                    String[] newRecord = Arrays.copyOfRange(first._2, 5, first._2.length);
+                                    EVENT_DATA_Vector.addAll(Arrays.asList(newRecord));
+                                } catch (Exception e) {
+                                    System.out.println("EXCEPTION Event");
+                                }
                             System.out.println("Event Data : " + EVENT_DATA_Vector);
                         }
-                }
-                     else if(topic.equals("Aw"))
-                    {
+                    } else if (topic.equals("Aw")) {
                         //Because AW sensors always send one more empty column
                         String[] finalSomme = Arrays.copyOf(somme, somme.length - 1);
                         records.forEachRemaining(record -> {
                             try {
-                                SparkUtils.sum.call(finalSomme, record._2, size,8);
+                                SparkUtils.sum.call(finalSomme, record._2, size, 8);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         });
-                        moyenne = SparkUtils.moyenne.call(finalSomme,size,8);
+                        moyenne = SparkUtils.moyenne.call(finalSomme, size, 8);
                         AW_VECTOR.addAll(Arrays.asList(moyenne));
                         System.out.println("AW : " + AW_VECTOR);
-                    }
-                    else if(topic.equals("Camera"))
-                    {
-                        //Because AW sensors always send one more empty column
+                    } else if (topic.equals("Camera")) {
+                        //Treating first element
+                        try {
+                            if ((first._2[2].equals("PROCESSED")) && (first._2[3].equals("WORKING")) && (first._2[4].equals("True")))
+                                CAMERA_VECTOR.add(Arrays.copyOfRange(first._2, 5, first._2.length));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         records.forEachRemaining(record -> {
                             try {
-                                if((record._2[2].equals("PROCESSED"))&&(record._2[3].equals("WORKING"))&&(record._2[4].equals("True")))
+                                if ((record._2[2].equals("PROCESSED")) && (record._2[3].equals("WORKING")) && (record._2[4].equals("True")))
                                     CAMERA_VECTOR.add(Arrays.copyOfRange(record._2, 5, record._2.length));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         });
-                        String[] string = new String[1];
-                        string[0] = "[";
-                        CAMERA_VECTOR.forEach(array -> {
-                            for (String s : array) {
-                                string[0] += s + ",";
-                            }
-                            string[0]+="]\n[";
-                        });
-                        System.out.println("Camera : " + string[0]);
+                        System.out.println("Camera : " + CAMERA_VECTOR.size());
                     }
 
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println("EMPTYYY");
                 }
             });
         });
