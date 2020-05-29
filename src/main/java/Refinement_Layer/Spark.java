@@ -59,133 +59,90 @@ public class Spark {
                     String key = first._1.split("-")[1];
                     String topic = first._1.split("-")[0];
                     //Number of the records, will be used for average
-                    AtomicReference<Double> size = new AtomicReference<>((double) 1);
                     String[] somme = first._2;
-                    Double[] moyenne;
 
                     if (topic.equals("Empatica")) {
                         if (key.equals("ACC")) {
-                            records.forEachRemaining(record -> {
-                                try {
-                                    SparkUtils.sum.call(somme, record._2, size, 0);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            });
-                            moyenne = SparkUtils.moyenne.call(somme, size, 0);
-                            ACC_Vector.addAll(Arrays.asList(moyenne));
-                            System.out.println("ACC : " + ACC_Vector);
-
+                            try {
+                            SparkUtils.process(records, ACC_Vector, somme, 0);
+                            System.out.println("ACC : " + ACC_Vector);}
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
                         } else if (key.equals("IBI")) {
                             //Get the value for which heartbeat duration is the longest
                             try {
-                                Tuple2<Double, Double> max = SparkUtils.maxHeartbeat.call(first._2, records);
-                                IBI_Vector.addAll(Arrays.asList(max._1, max._2));
+                                SparkUtils.maxHeartbeat.call(first._2, records, IBI_Vector);
+                                System.out.println("IBI : " + IBI_Vector);
                             } catch (Exception e) {
-                                IBI_Vector.addAll(Arrays.asList(0.0, 0.0));
+                                e.printStackTrace();
                             }
-                            System.out.println("IBI : " + IBI_Vector);
-
                         } else {
-                            records.forEachRemaining(record -> {
-                                try {
-                                    SparkUtils.sum.call(somme, record._2, size, 0);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            });
-                            //Calculate average of all columns
-                            moyenne = SparkUtils.moyenne.call(somme, size, 0);
                             switch (key) {
                                 case "BVP":
-                                    BVP_Vector.addAll(Arrays.asList(moyenne));
-                                    System.out.println("BVP : " + BVP_Vector);
+                                    try {
+                                    SparkUtils.process(records, BVP_Vector, somme, 0);
+                                    System.out.println("BVP : " + BVP_Vector);}
+                                    catch (Exception e){
+                                        e.printStackTrace();
+                                    }
                                     break;
                                 case "EDA":
-                                    EDA_Vector.addAll(Arrays.asList(moyenne));
-                                    System.out.println("EDA : " + EDA_Vector);
+                                    try {
+                                    SparkUtils.process(records, EDA_Vector, somme, 0);
+                                    System.out.println("EDA : " + EDA_Vector); }
+                                    catch (Exception e){
+                                        e.printStackTrace();
+                                    }
                                     break;
                                 case "HR":
-                                    HR_Vector.addAll(Arrays.asList(moyenne));
-                                    System.out.println("HR : " + HR_Vector);
+                                    try {
+                                    SparkUtils.process(records, HR_Vector, somme, 0);
+                                    System.out.println("HR : " + HR_Vector);}
+                                    catch (Exception e){
+                                        e.printStackTrace();
+                                    }
                                     break;
                                 case "TEMP":
-                                    TEMP_Vector.addAll(Arrays.asList(moyenne));
-                                    System.out.println("TEMP : " + TEMP_Vector);
+                                    try {
+                                    SparkUtils.process(records, TEMP_Vector, somme, 0);
+                                    System.out.println("TEMP : " + TEMP_Vector);}
+                                    catch (Exception e){
+                                        e.printStackTrace();
+                                    }
                                     break;
                             }
                         }
                     } else if (topic.equals("Zephyr")) {
                         if (key.equals("BR_RR")) {
-                            records.forEachRemaining(record -> {
-                                try {
-                                    SparkUtils.sum.call(somme, record._2, size, 1);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            });
-                            moyenne = SparkUtils.moyenne.call(somme, size, 1);
-                            BR_RR_Vector.addAll(Arrays.asList(moyenne));
-                            System.out.println("BR_RR : " + BR_RR_Vector);
+                            try {
+                            SparkUtils.process(records, BR_RR_Vector, somme, 1);
+                            System.out.println("BR_RR : " + BR_RR_Vector);}
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
                         } else if (key.equals("ECG")) {
-                            records.forEachRemaining(record -> {
-                                try {
-                                    SparkUtils.sum.call(somme, record._2, size, 1);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            });
-                            moyenne = SparkUtils.moyenne.call(somme, size, 1);
-                            ECG_Vector.addAll(Arrays.asList(moyenne));
-                            System.out.println("ECG : " + ECG_Vector);
-                        } else if (key.equals("General")) {
-                                try {
-                                    //Removes the timestamp attribute
-                                    String[] nonTimedRecord = Arrays.copyOfRange(first._2, 1, first._2.length);
-                                    Double[] convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
-                                    GENERAL_Vector.addAll(Arrays.asList(convertedArray));
-                                } catch (Exception e) {
-                                    System.out.println("EXCEPTION GENERAL");
-                                }
-                            System.out.println("GENERAL : " + GENERAL_Vector);
-                        } else if (key.equals("Event_Data")) {
-                                try {
-                                    String[] newRecord = Arrays.copyOfRange(first._2, 5, first._2.length);
-                                    EVENT_DATA_Vector.addAll(Arrays.asList(newRecord));
-                                } catch (Exception e) {
-                                    System.out.println("EXCEPTION Event");
-                                }
-                            System.out.println("Event Data : " + EVENT_DATA_Vector);
+                            try {
+                            SparkUtils.process(records, ECG_Vector, somme, 1);
+                            System.out.println("ECG : " + ECG_Vector);}
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try{
+                                SparkUtils.process_low_frequency(key, first, GENERAL_Vector, EVENT_DATA_Vector);
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
                         }
                     } else if (topic.equals("Aw")) {
                         //Because AW sensors always send one more empty column
                         String[] finalSomme = Arrays.copyOf(somme, somme.length - 1);
-                        records.forEachRemaining(record -> {
-                            try {
-                                SparkUtils.sum.call(finalSomme, record._2, size, 8);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        });
-                        moyenne = SparkUtils.moyenne.call(finalSomme, size, 8);
-                        AW_VECTOR.addAll(Arrays.asList(moyenne));
+                        SparkUtils.process(records, AW_VECTOR, somme, 8);
                         System.out.println("AW : " + AW_VECTOR);
                     } else if (topic.equals("Camera")) {
-                        //Treating first element
-                        try {
-                            if ((first._2[2].equals("PROCESSED")) && (first._2[3].equals("WORKING")) && (first._2[4].equals("True")))
-                                CAMERA_VECTOR.add(Arrays.copyOfRange(first._2, 5, first._2.length));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        records.forEachRemaining(record -> {
-                            try {
-                                if ((record._2[2].equals("PROCESSED")) && (record._2[3].equals("WORKING")) && (record._2[4].equals("True")))
-                                    CAMERA_VECTOR.add(Arrays.copyOfRange(record._2, 5, record._2.length));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        });
+                        SparkUtils.process_camera(first, records, CAMERA_VECTOR);
                         System.out.println("Camera : " + CAMERA_VECTOR.size());
                     }
 

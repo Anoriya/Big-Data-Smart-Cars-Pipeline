@@ -11,9 +11,11 @@ import scala.Tuple2;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SparkUtils implements Serializable {
+
 
     final static Function4<String[], String[], AtomicReference<Double>, Integer, Void> sum = new Function4<String[], String[], AtomicReference<Double>, Integer, Void>() {
         @Override
@@ -45,16 +47,21 @@ public class SparkUtils implements Serializable {
         }
     };
 
-    final static Function2<String[], Iterator<Tuple2<String, String[]>>, Tuple2<Double, Double>> maxHeartbeat = new Function2<String[], Iterator<Tuple2<String, String[]>>, Tuple2<Double, Double>>() {
+    final static Function3<String[], Iterator<Tuple2<String, String[]>>, List<Double>, Void> maxHeartbeat = new Function3<String[], Iterator<Tuple2<String, String[]>>, List<Double>, Void>() {
         @Override
-        public Tuple2<Double, Double> call(String[] first, Iterator<Tuple2<String, String[]>> records) throws Exception {
+        public Void call(String[] first, Iterator<Tuple2<String, String[]>> records, List<Double> vector) throws Exception {
             AtomicReference<Tuple2<Double, Double>> max = new AtomicReference<>(new Tuple2<>(Double.parseDouble(first[0]), Double.parseDouble(first[1])));
-            records.forEachRemaining(record -> {
-                if (Double.parseDouble(record._2[1]) > max.get()._2) {
-                    max.set(new Tuple2<>(Double.parseDouble(record._2[0]), Double.parseDouble(record._2[1])));
-                }
-            });
-            return max.get();
+            try {
+                records.forEachRemaining(record -> {
+                    if (Double.parseDouble(record._2[1]) > max.get()._2) {
+                        max.set(new Tuple2<>(Double.parseDouble(record._2[0]), Double.parseDouble(record._2[1])));
+                    }
+                });
+                vector.addAll(Arrays.asList(max.get()._1, max.get()._2));
+            } catch (Exception e) {
+                vector.addAll(Arrays.asList(0.0, 0.0));
+            }
+            return null;
         }
     };
 
@@ -65,8 +72,7 @@ public class SparkUtils implements Serializable {
             for (int i = 0; i < doublesArray.length; i++) {
                 try {
                     doublesArray[i] = Double.parseDouble(stringsArray[i]);
-                }
-                catch (NullPointerException | NumberFormatException e){
+                } catch (NullPointerException | NumberFormatException e) {
                     doublesArray[i] = 0.0;
                 }
             }
@@ -203,4 +209,58 @@ public class SparkUtils implements Serializable {
 
         }
     };
+
+    public static void process_camera(Tuple2<String, String[]> first, Iterator<Tuple2<String, String[]>> records, List<String[]> CAMERA_VECTOR){
+        //Treating first element
+        try {
+            if ((first._2[2].equals("PROCESSED")) && (first._2[3].equals("WORKING")) && (first._2[4].equals("True")))
+                CAMERA_VECTOR.add(Arrays.copyOfRange(first._2, 5, first._2.length));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        records.forEachRemaining(record -> {
+            try {
+                if ((record._2[2].equals("PROCESSED")) && (record._2[3].equals("WORKING")) && (record._2[4].equals("True")))
+                    CAMERA_VECTOR.add(Arrays.copyOfRange(record._2, 5, record._2.length));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public static void process_low_frequency(String key, Tuple2<String, String[]> first, List<Double> GENERAL_Vector, List<String> EVENT_DATA_Vector) {
+        if (key.equals("General")) {
+            try {
+                //Removes the timestamp attribute
+                String[] nonTimedRecord = Arrays.copyOfRange(first._2, 1, first._2.length);
+                Double[] convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
+                GENERAL_Vector.addAll(Arrays.asList(convertedArray));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println("GENERAL : " + GENERAL_Vector);
+        } else if (key.equals("Event_Data")) {
+            try {
+                String[] newRecord = Arrays.copyOfRange(first._2, 5, first._2.length);
+                EVENT_DATA_Vector.addAll(Arrays.asList(newRecord));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println("Event Data : " + EVENT_DATA_Vector);
+        }
+    }
+
+    public static void process(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] somme, Integer start) throws Exception {
+        AtomicReference<Double> size = new AtomicReference<>((double) 1);
+        Double[] moyenne;
+        records.forEachRemaining(record -> {
+            try {
+                SparkUtils.sum.call(somme, record._2, size, start);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        moyenne = SparkUtils.moyenne.call(somme, size, start);
+        vector.addAll(Arrays.asList(moyenne));
+    }
 }
