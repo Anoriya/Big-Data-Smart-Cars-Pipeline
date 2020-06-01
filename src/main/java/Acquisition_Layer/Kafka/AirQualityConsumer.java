@@ -16,7 +16,7 @@ public class AirQualityConsumer extends AbstractConsumer {
     private static final String FILEPATH = "/user/hdfs/AirQuality/";
     private static final String FILENAME = "test";
 
-    protected AirQualityConsumer(String group_id, String offset_reset, String auto_commit) {
+    public AirQualityConsumer(String group_id, String offset_reset, String auto_commit) {
         super(TOPIC,FILEPATH, FILENAME, group_id, offset_reset, auto_commit);
     }
 
@@ -24,28 +24,27 @@ public class AirQualityConsumer extends AbstractConsumer {
     protected void storeData(HdfsWriter csv_writer, String filepath, String filename, DateTimeFormatter formatter, LocalDateTime date) throws IOException {
 
         // Init Hadoop outputStream
-        FSDataOutputStream outputStream_SGP = csv_writer.createFileAndOutputStream(filepath, filename + "-SGP-" + formatter.format(date) + ".csv");
-        FSDataOutputStream outputStream_SPS = csv_writer.createFileAndOutputStream(filepath, filename + "-SPS-" + formatter.format(date) + ".csv");
+        FSDataOutputStream outputStream_QUANTITY = csv_writer.createFileAndOutputStream(filepath, filename + "-QUANTITY-" + formatter.format(date) + ".csv");
+        FSDataOutputStream outputStream_CONCENTRATION = csv_writer.createFileAndOutputStream(filepath, filename + "-CONCENTRATION-" + formatter.format(date) + ".csv");
 
         // While we're still at today
-        while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), 23, 59))) {
-            ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(100));
+        while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), date.getHour(), date.getMinute() + 1))) {
+            ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(2000));
             for (ConsumerRecord<String, String> record : records) {
+                System.out.println(record.key());
                 switch (record.key()) {
-                    case "SGP":
-                        csv_writer.writeLineIntoOutputStream(record.value(), outputStream_SGP);
+                    case "Quantity":
+                        csv_writer.writeLineIntoOutputStream(record.value(), outputStream_QUANTITY);
                         this.consumer.commitSync();
                         break;
-                    case "SPS":
-                        csv_writer.writeLineIntoOutputStream(record.value(), outputStream_SPS);
+                    case "Concentration":
+                        csv_writer.writeLineIntoOutputStream(record.value(), outputStream_CONCENTRATION);
                         this.consumer.commitSync();
                         break;
-
                 }
             }
         }
-        outputStream_SGP.close();
-        outputStream_SPS.close();
-
+        outputStream_QUANTITY.close();
+        outputStream_CONCENTRATION.close();
     }
 }

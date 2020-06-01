@@ -26,7 +26,7 @@ public class Spark {
         kafkaParams.put("auto.offset.reset", "earliest");
         kafkaParams.put("enable.auto.commit", false);
 
-        Collection<String> topics = Arrays.asList("Aw", "Zephyr", "Camera", "Empatica");
+        Collection<String> topics = Arrays.asList("Aw", "Zephyr", "Camera", "Empatica","AirQuality");
 
         JavaInputDStream<ConsumerRecord<String, String>> stream = KafkaUtils.createDirectStream(
                 ssc,
@@ -50,6 +50,8 @@ public class Spark {
         List<String> EVENT_DATA_Vector = new ArrayList<String>();
         List<Double> AW_VECTOR = new ArrayList<Double>();
         List<String[]> CAMERA_VECTOR = new ArrayList<String[]>();
+        List<Double> QUANTITY_Vector = new ArrayList<Double>();
+        List<Double> CONCENTRATION_Vector = new ArrayList<Double>();
 
         topic_value.foreachRDD(rdd -> {
             rdd.foreachPartition(records -> {
@@ -146,6 +148,26 @@ public class Spark {
                         System.out.println("Camera : " + CAMERA_VECTOR.size());
                     }
 
+                    else if(topic.equals("AirQuality")){
+                            if(key.equals("Quantity")){
+                                try {
+                                    SparkUtils.process(records, QUANTITY_Vector, somme, 2);
+                                    System.out.println("QUALITY : " + QUANTITY_Vector);}
+                                catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+                            else if (key.equals("Concentration")){
+                                try {
+                                    SparkUtils.process(records, CONCENTRATION_Vector, somme, 2);
+                                    System.out.println("CONCENTRATION : " + CONCENTRATION_Vector);}
+                                catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+
+
+                        }
 
                 } catch (Exception e) {
                     System.out.println("EMPTYYY");
