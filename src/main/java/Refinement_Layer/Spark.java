@@ -152,7 +152,7 @@ public class Spark {
                             if(key.equals("Quantity")){
                                 try {
                                     SparkUtils.process(records, QUANTITY_Vector, somme, 2);
-                                    System.out.println("QUALITY : " + QUANTITY_Vector);}
+                                    System.out.println("Quantity : " + QUANTITY_Vector);}
                                 catch (Exception e){
                                     e.printStackTrace();
                                 }

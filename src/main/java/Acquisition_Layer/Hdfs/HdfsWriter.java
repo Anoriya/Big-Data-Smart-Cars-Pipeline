@@ -61,7 +61,12 @@ public class HdfsWriter {
         Path newFolderPath = this.createFolder(path);
         //Create a path
         //Init output stream
-        return FS.create(new Path(newFolderPath + "/" + fileName));
+        try{
+            return FS.append(new Path(newFolderPath + "/" + fileName));
+        }
+        catch(Exception e){
+            return FS.create(new Path(newFolderPath + "/" + fileName));
+        }
     }
 
 

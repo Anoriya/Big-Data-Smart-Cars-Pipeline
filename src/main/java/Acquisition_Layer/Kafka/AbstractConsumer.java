@@ -61,7 +61,7 @@ public abstract class AbstractConsumer implements Runnable {
     protected void storeData(HdfsWriter csv_writer, String filepath, String filename, DateTimeFormatter formatter, LocalDateTime date) throws IOException {
         // Init Hadoop outputStream
         FSDataOutputStream outputStream = csv_writer.createFileAndOutputStream(filepath,
-                filename + formatter.format(date) + ".csv");
+                filename + ".csv");
         // While we're still at today
         while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), date.getHour(), date.getMinute() + 1))) {
             ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(2000));
