@@ -31,7 +31,6 @@ public class AirQualityConsumer extends AbstractConsumer {
         while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), date.getHour(), date.getMinute() + 1))) {
             ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(2000));
             for (ConsumerRecord<String, String> record : records) {
-                System.out.println(record.key());
                 switch (record.key()) {
                     case "Quantity":
                         csv_writer.writeLineIntoOutputStream(record.value(), outputStream_QUANTITY);
