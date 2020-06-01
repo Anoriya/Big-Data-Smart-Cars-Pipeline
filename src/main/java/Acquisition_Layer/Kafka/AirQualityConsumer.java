@@ -16,7 +16,7 @@ public class AirQualityConsumer extends AbstractConsumer {
     private static final String FILEPATH = "/user/hdfs/AirQuality/";
     private static final String FILENAME = "test";
 
-    protected AirQualityConsumer(String group_id, String offset_reset, String auto_commit) {
+    public AirQualityConsumer(String group_id, String offset_reset, String auto_commit) {
         super(TOPIC,FILEPATH, FILENAME, group_id, offset_reset, auto_commit);
     }
 
