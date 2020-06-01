@@ -66,7 +66,6 @@ public abstract class AbstractConsumer implements Runnable {
         while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), date.getHour(), date.getMinute() + 1))) {
             ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(2000));
             for (ConsumerRecord<String, String> record : records) {
-                System.out.println(record.key());
                 csv_writer.writeLineIntoOutputStream(record.value(), outputStream);
                 this.consumer.commitSync();
             }

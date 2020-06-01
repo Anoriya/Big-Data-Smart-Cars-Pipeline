@@ -1,4 +1,5 @@
 package Acquisition_Layer;
+
 import Acquisition_Layer.Kafka.*;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ public class main {
         AwConsumer awConsumer = new AwConsumer("Aw", "earliest", "false");
         ZephyrConsumer zephyrConsumer = new ZephyrConsumer("Zephyr", "earliest", "false");
         EmpaticaConsumer empaticaConsumer = new EmpaticaConsumer("Empatica", "earliest", "false");
-        AirQualityConsumer airQualityConsumer=new AirQualityConsumer("AirQuality", "earliest", "false");
+        AirQualityConsumer airQualityConsumer = new AirQualityConsumer("AirQuality", "earliest", "false");
 
         Thread aw = new Thread(awConsumer);
         Thread zephyr = new Thread(zephyrConsumer);

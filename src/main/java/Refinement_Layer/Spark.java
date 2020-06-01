@@ -141,7 +141,7 @@ public class Spark {
                     } else if (topic.equals("Aw")) {
                         //Because AW sensors always send one more empty column
                         String[] finalSomme = Arrays.copyOf(somme, somme.length - 1);
-                        SparkUtils.process(records, AW_VECTOR, somme, 8);
+                        SparkUtils.process(records, AW_VECTOR, finalSomme, 8);
                         System.out.println("AW : " + AW_VECTOR);
                     } else if (topic.equals("Camera")) {
                         SparkUtils.process_camera(first, records, CAMERA_VECTOR);
