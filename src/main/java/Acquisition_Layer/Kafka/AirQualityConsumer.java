@@ -24,8 +24,8 @@ public class AirQualityConsumer extends AbstractConsumer {
     protected void storeData(HdfsWriter csv_writer, String filepath, String filename, DateTimeFormatter formatter, LocalDateTime date) throws IOException {
 
         // Init Hadoop outputStream
-        FSDataOutputStream outputStream_QUANTITY = csv_writer.createFileAndOutputStream(filepath, filename + "-QUANTITY-" + formatter.format(date) + ".csv");
-        FSDataOutputStream outputStream_CONCENTRATION = csv_writer.createFileAndOutputStream(filepath, filename + "-CONCENTRATION-" + formatter.format(date) + ".csv");
+        FSDataOutputStream outputStream_QUANTITY = csv_writer.createFileAndOutputStream(filepath, filename + "-QUANTITY-" + ".csv");
+        FSDataOutputStream outputStream_CONCENTRATION = csv_writer.createFileAndOutputStream(filepath, filename + "-CONCENTRATION-" + ".csv");
 
         // While we're still at today
         while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), date.getHour(), date.getMinute() + 1))) {
