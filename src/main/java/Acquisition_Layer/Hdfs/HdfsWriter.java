@@ -23,6 +23,8 @@ public class HdfsWriter {
         // Because of Maven
         CONF.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
         CONF.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+        // Set node replacement strategy, for small clusters
+        CONF.set("dfs.client.block.write.replace-datanode-on-failure.policy", "NEVER");
         // Set HADOOP user
         System.setProperty("HADOOP_USER_NAME", "hdfs");
         System.setProperty("hadoop.home.dir", "/var/lib/hadoop-hdfs/");
@@ -61,10 +63,9 @@ public class HdfsWriter {
         Path newFolderPath = this.createFolder(path);
         //Create a path
         //Init output stream
-        try{
+        try {
             return FS.append(new Path(newFolderPath + "/" + fileName));
-        }
-        catch(Exception e){
+        } catch (IOException e) {
             return FS.create(new Path(newFolderPath + "/" + fileName));
         }
     }
