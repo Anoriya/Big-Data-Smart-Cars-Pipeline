@@ -1,5 +1,8 @@
 package Refinement_Layer;
 
+import DBSCAN.DBSCANClusterer;
+import DBSCAN.DBSCANClusteringException;
+import DBSCAN.metrics.DistanceMetricNumbers;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.Function3;
@@ -9,10 +12,13 @@ import scala.Function1;
 import scala.Tuple2;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.junit.Assert.fail;
 
 public class SparkUtils implements Serializable {
 
@@ -65,27 +71,27 @@ public class SparkUtils implements Serializable {
         }
     };
 
-    final static Function1<String[], Double[]> convertArrayOfStringsToDouble = new Function1<String[], Double[]>() {
+    final static Function1<String[], ArrayList<Double>> convertArrayOfStringsToDouble = new Function1<String[], ArrayList<Double>>() {
         @Override
-        public Double[] apply(String[] stringsArray) {
-            Double[] doublesArray = new Double[stringsArray.length];
-            for (int i = 0; i < doublesArray.length; i++) {
+        public ArrayList<Double> apply(String[] stringsArray) {
+            ArrayList<Double> doublesArray = new ArrayList<Double>();
+            for (int i = 0; i < stringsArray.length; i++) {
                 try {
-                    doublesArray[i] = Double.parseDouble(stringsArray[i]);
+                    doublesArray.add(Double.parseDouble(stringsArray[i]));
                 } catch (NullPointerException | NumberFormatException e) {
-                    doublesArray[i] = 0.0;
+                    doublesArray.add(0.0);
                 }
             }
             return doublesArray;
         }
 
         @Override
-        public <A> Function1<A, Double[]> compose(Function1<A, String[]> function1) {
+        public <A> Function1<A, ArrayList<Double>> compose(Function1<A, String[]> function1) {
             return null;
         }
 
         @Override
-        public <A> Function1<String[], A> andThen(Function1<Double[], A> function1) {
+        public <A> Function1<String[], A> andThen(Function1<ArrayList<Double>, A> function1) {
             return null;
         }
 
@@ -233,8 +239,9 @@ public class SparkUtils implements Serializable {
             try {
                 //Removes the timestamp attribute
                 String[] nonTimedRecord = Arrays.copyOfRange(first._2, 1, first._2.length);
-                Double[] convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
-                GENERAL_Vector.addAll(Arrays.asList(convertedArray));
+//                Double[] convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
+//                GENERAL_Vector.addAll(Arrays.asList(convertedArray));
+                GENERAL_Vector.addAll(Arrays.asList(new Double[1]));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -253,14 +260,43 @@ public class SparkUtils implements Serializable {
     public static void process(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] somme, Integer start) throws Exception {
         AtomicReference<Double> size = new AtomicReference<>((double) 1);
         Double[] moyenne;
+        // Init points list
+        ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
+        // Add the first element coming from records.next()
+        data.add(convertArrayOfStringsToDouble.apply(somme));
+
         records.forEachRemaining(record -> {
             try {
-                SparkUtils.sum.call(somme, record._2, size, start);
-            } catch (Exception e) {
+                data.add(convertArrayOfStringsToDouble.apply(record._2));
+            }
+            catch (Exception e){
                 e.printStackTrace();
             }
         });
-        moyenne = SparkUtils.moyenne.call(somme, size, start);
-        vector.addAll(Arrays.asList(moyenne));
+
+        DBSCANClusterer<ArrayList<Double>> clusterer = null;
+        try {
+            clusterer = new DBSCANClusterer<ArrayList<Double>>(data, 2, 10, new DistanceMetricNumbers(),13);
+        } catch (DBSCANClusteringException e1) {
+            fail("Should not have failed on instantiation: " + e1);
+        }
+
+        ArrayList<ArrayList<ArrayList<Double>>> result = null;
+
+        try {
+            result = clusterer.performClustering();
+        } catch (DBSCANClusteringException e) {
+            fail("Should not have failed while performing clustering: " + e);
+        }
+
+        System.out.println("CLUSTERRR " + result.size());
+
+//            try {
+//                SparkUtils.sum.call(somme, record._2, size, start);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        moyenne = SparkUtils.moyenne.call(somme, size, start);
+//        vector.addAll(Arrays.asList(moyenne));
     }
 }
