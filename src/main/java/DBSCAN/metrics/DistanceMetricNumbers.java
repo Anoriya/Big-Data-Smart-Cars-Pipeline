@@ -20,7 +20,7 @@ public class DistanceMetricNumbers implements DistanceMetric<ArrayList<Double>> 
         for (int i = start; i < val1.size(); i++) {
             Manhatan_distance += Math.pow(val1.get(i) - val2.get(i),2);
         }
-        System.out.println("DST " + Math.sqrt(Manhatan_distance)) ;
+//        System.out.println("DST " + Math.sqrt(Manhatan_distance)) ;
         return Math.sqrt(Manhatan_distance);
     }
 }

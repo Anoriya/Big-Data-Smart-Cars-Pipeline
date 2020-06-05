@@ -276,7 +276,7 @@ public class SparkUtils implements Serializable {
 
         DBSCANClusterer<ArrayList<Double>> clusterer = null;
         try {
-            clusterer = new DBSCANClusterer<ArrayList<Double>>(data, 2, 10, new DistanceMetricNumbers(),13);
+            clusterer = new DBSCANClusterer<ArrayList<Double>>(data, 2, 550, new DistanceMetricNumbers(),13);
         } catch (DBSCANClusteringException e1) {
             fail("Should not have failed on instantiation: " + e1);
         }
@@ -289,7 +289,12 @@ public class SparkUtils implements Serializable {
             fail("Should not have failed while performing clustering: " + e);
         }
 
-        System.out.println("CLUSTERRR " + result.size());
+        System.out.println("CLUSTERRRRRRRRRRR " + result.size());
+
+        result.forEach(resultt ->{
+            System.out.println("SIZEEEEEEEEEE " + resultt.size());
+        });
+
 
 //            try {
 //                SparkUtils.sum.call(somme, record._2, size, start);
