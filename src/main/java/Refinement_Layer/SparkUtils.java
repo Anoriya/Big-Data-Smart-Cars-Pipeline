@@ -3,13 +3,9 @@ package Refinement_Layer;
 import DBSCAN.DBSCANClusterer;
 import DBSCAN.DBSCANClusteringException;
 import DBSCAN.metrics.DistanceMetricNumbers;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.Function3;
-import org.apache.spark.api.java.function.Function4;
-import scala.Function;
 import scala.Function1;
-import scala.Int;
 import scala.Tuple2;
 
 import java.io.Serializable;
@@ -200,7 +196,7 @@ public class SparkUtils implements Serializable {
         }
     };
 
-    final public static Function1<String[], ArrayList<Double>> convertArrayOfStringsToDouble = new Function1<String[], ArrayList<Double>>() {
+    final public static Function1<String[], ArrayList<Double>> convertArrayOfStringsToListOfDouble = new Function1<String[], ArrayList<Double>>() {
         @Override
         public ArrayList<Double> apply(String[] stringsArray) {
             ArrayList<Double> doublesArray = new ArrayList<Double>();
@@ -365,19 +361,19 @@ public class SparkUtils implements Serializable {
             try {
                 //Removes the timestamp attribute
                 String[] nonTimedRecord = Arrays.copyOfRange(first, start, first.length);
-                ArrayList<Double> convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
+                ArrayList<Double> convertedArray = SparkUtils.convertArrayOfStringsToListOfDouble.apply(nonTimedRecord);
                 GENERAL_Vector.addAll(convertedArray);
             } catch (Exception e) {
                 e.printStackTrace();
             }
     }
 
-    public static void processLowFlow(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first) throws Exception {
+    public static void processLowFlow(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first, Integer start) throws Exception {
         Double[] moyenne;
         ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
-        data.add(convertArrayOfStringsToDouble.apply(cleaned_first));
+        data.add(convertArrayOfStringsToListOfDouble.apply(cleaned_first));
         records.forEachRemaining(record -> {
-            data.add(convertArrayOfStringsToDouble.apply(record._2));
+            data.add(convertArrayOfStringsToListOfDouble.apply(Arrays.copyOfRange(record._2, start,record._2.length)));
         });
         Double[] somme = null;
         try {
@@ -395,12 +391,12 @@ public class SparkUtils implements Serializable {
         // Init points list
         ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
         // Add the first element coming from records.next()
-        data.add(convertArrayOfStringsToDouble.apply(cleaned_first));
+        data.add(convertArrayOfStringsToListOfDouble.apply(cleaned_first));
 
         //Storing kafka records into a data as an array list of points to perform clustering on
         records.forEachRemaining(record -> {
             try {
-                data.add(convertArrayOfStringsToDouble.apply(Arrays.copyOfRange(record._2, start,end)));
+                data.add(convertArrayOfStringsToListOfDouble.apply(Arrays.copyOfRange(record._2, start,end)));
             }
             catch (Exception e){
                 e.printStackTrace();

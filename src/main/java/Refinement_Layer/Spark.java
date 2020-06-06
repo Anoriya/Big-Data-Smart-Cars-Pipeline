@@ -46,7 +46,6 @@ public class Spark {
         List<Double> BR_RR_Vector = new ArrayList<Double>();
         List<Double> ECG_Vector = new ArrayList<Double>();
         List<Double> GENERAL_Vector = new ArrayList<Double>();
-        List<String> EVENT_DATA_Vector = new ArrayList<String>();
         List<Double> AW_VECTOR = new ArrayList<Double>();
         List<String[]> CAMERA_VECTOR = new ArrayList<String[]>();
         List<Double> QUANTITY_Vector = new ArrayList<Double>();
@@ -63,7 +62,7 @@ public class Spark {
                     if (topic.equals("Empatica")) {
                         if (key.equals("ACC")) {
                             try {
-                            SparkUtils.processWithClustering(records, ACC_Vector, somme, 0);
+                            SparkUtils.processLowFlow(records, ACC_Vector, first._2,0);
                             System.out.println("ACC : " + ACC_Vector);}
                             catch (Exception e){
                                 e.printStackTrace();
@@ -80,7 +79,7 @@ public class Spark {
                             switch (key) {
                                 case "BVP":
                                     try {
-                                    SparkUtils.processWithClustering(records, BVP_Vector, somme, 0);
+                                        SparkUtils.processLowFlow(records, BVP_Vector, first._2,0);
                                     System.out.println("BVP : " + BVP_Vector);}
                                     catch (Exception e){
                                         e.printStackTrace();
@@ -88,7 +87,7 @@ public class Spark {
                                     break;
                                 case "EDA":
                                     try {
-                                    SparkUtils.processWithClustering(records, EDA_Vector, somme, 0);
+                                        SparkUtils.processLowFlow(records, EDA_Vector, first._2,0);
                                     System.out.println("EDA : " + EDA_Vector); }
                                     catch (Exception e){
                                         e.printStackTrace();
@@ -96,7 +95,7 @@ public class Spark {
                                     break;
                                 case "HR":
                                     try {
-                                    SparkUtils.processWithClustering(records, HR_Vector, somme, 0);
+                                        SparkUtils.processLowFlow(records, HR_Vector, first._2,0);
                                     System.out.println("HR : " + HR_Vector);}
                                     catch (Exception e){
                                         e.printStackTrace();
@@ -104,7 +103,7 @@ public class Spark {
                                     break;
                                 case "TEMP":
                                     try {
-                                    SparkUtils.processWithClustering(records, TEMP_Vector, somme, 0);
+                                        SparkUtils.processLowFlow(records, TEMP_Vector, first._2,0);
                                     System.out.println("TEMP : " + TEMP_Vector);}
                                     catch (Exception e){
                                         e.printStackTrace();
@@ -152,25 +151,26 @@ public class Spark {
                         System.out.println("Camera : " + CAMERA_VECTOR.size());
                     }
 
-//                    else if(topic.equals("AirQuality")){
-//                            if(key.equals("Quantity")){
-//                                try {
-//                                    SparkUtils.process(records, QUANTITY_Vector, somme, 2);
-//                                    System.out.println("Quantity : " + QUANTITY_Vector);}
-//                                catch (Exception e){
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                            else if (key.equals("Concentration")){
-//                                try {
-//                                    SparkUtils.process(records, CONCENTRATION_Vector, somme, 2);
-//                                    System.out.println("CONCENTRATION : " + CONCENTRATION_Vector);}
-//                                catch (Exception e){
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//
-//                        }
+                    else if(topic.equals("AirQuality")){
+                        String[] cleaned_First = Arrays.copyOfRange(first._2, 2, first._2.length);
+                        if(key.equals("Quantity")){
+                                try {
+                                    SparkUtils.processLowFlow(records, QUANTITY_Vector, cleaned_First,2);
+                                    System.out.println("Quantity : " + QUANTITY_Vector);}
+                                catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+                            else if (key.equals("Concentration")){
+                                try {
+                                    SparkUtils.processLowFlow(records, CONCENTRATION_Vector, cleaned_First,2);
+                                    System.out.println("CONCENTRATION : " + CONCENTRATION_Vector);}
+                                catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        }
 
                 } catch (Exception e) {
                     System.out.println("EMPTYYY");
