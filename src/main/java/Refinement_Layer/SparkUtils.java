@@ -29,10 +29,9 @@ public class SparkUtils implements Serializable {
         public Double[] apply(ArrayList<ArrayList<Double>> datas) {
             //Utile for getting the length in the for loop
             int size = datas.get(0).size();
-            System.out.println("SOZHHHHH " + size);
             Double[] somme = new Double[size];
+            Arrays.fill(somme, 0.0);
             datas.forEach(data -> {
-                System.out.println("DATAA " + data);
                 for (int i = 0; i < size; i++) {
                     somme[i] = somme[i] + data.get(i);
                 }
@@ -174,7 +173,8 @@ public class SparkUtils implements Serializable {
         public Double[] call(Double[] somme, Integer size) throws Exception {
             if(somme != null){
             Double[] moyenne = new Double[somme.length];
-            for (int i = 0; i < somme.length; i++) {
+            Arrays.fill(moyenne, 0.0);
+                for (int i = 0; i < somme.length; i++) {
                     moyenne[i] = somme[i] / size;
             }
             return moyenne;
@@ -361,30 +361,37 @@ public class SparkUtils implements Serializable {
         });
     }
 
-    public static void process_low_frequency(String key, Tuple2<String, String[]> first, List<Double> GENERAL_Vector, List<String> EVENT_DATA_Vector) {
-        if (key.equals("General")) {
+    public static void process_low_frequency(String[] first, Integer start, List<Double> GENERAL_Vector) {
             try {
                 //Removes the timestamp attribute
-                String[] nonTimedRecord = Arrays.copyOfRange(first._2, 1, first._2.length);
-//                Double[] convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
-//                GENERAL_Vector.addAll(Arrays.asList(convertedArray));
-                GENERAL_Vector.addAll(Arrays.asList(new Double[1]));
+                String[] nonTimedRecord = Arrays.copyOfRange(first, start, first.length);
+                ArrayList<Double> convertedArray = SparkUtils.convertArrayOfStringsToDouble.apply(nonTimedRecord);
+                GENERAL_Vector.addAll(convertedArray);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            System.out.println("GENERAL : " + GENERAL_Vector);
-        } else if (key.equals("Event_Data")) {
-            try {
-                String[] newRecord = Arrays.copyOfRange(first._2, 5, first._2.length);
-                EVENT_DATA_Vector.addAll(Arrays.asList(newRecord));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            System.out.println("Event Data : " + EVENT_DATA_Vector);
-        }
     }
 
-    public static void process(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first,Integer start, Integer start_clustering, Double epsilon) throws Exception {
+    public static void processLowFlow(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first){
+        Double[] moyenne;
+        List<Double[]> data = new ArrayList<Double[]>();
+        records.forEachRemaining(record -> {
+            Double[] doulbeRecord = convertArrayOfStringsToDouble.apply(record._2);
+            data.add(doulbeRecord);
+        });
+        records.forEachRemaining(record -> {
+            try {
+                SparkUtils.sum.call(somme, record._2, size, start);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        moyenne = SparkUtils.moyenne.call(somme, size, start);
+        vector.addAll(Arrays.asList(moyenne));
+
+    }
+
+    public static void processWithClustering(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first, Integer start, Integer end, Integer start_clustering, Double epsilon) throws Exception {
         Double[] moyenne;
         // Init points list
         ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
@@ -394,7 +401,7 @@ public class SparkUtils implements Serializable {
         //Storing kafka records into a data as an array list of points to perform clustering on
         records.forEachRemaining(record -> {
             try {
-                data.add(convertArrayOfStringsToDouble.apply(Arrays.copyOfRange(record._2, start,record._2.length - 1)));
+                data.add(convertArrayOfStringsToDouble.apply(Arrays.copyOfRange(record._2, start,end)));
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -415,8 +422,6 @@ public class SparkUtils implements Serializable {
         } catch (DBSCANClusteringException e) {
             fail("Should not have failed while performing clustering: " + e);
         }
-
-        System.out.println("CLUSTERRRRRRRRRRR " + clustered_data.size());
 
         Double[] somme = null;
         try {

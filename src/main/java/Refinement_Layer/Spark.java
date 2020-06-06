@@ -4,7 +4,6 @@ package Refinement_Layer;
 import org.apache.spark.streaming.api.java.*;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -61,95 +60,97 @@ public class Spark {
                     String key = first._1.split("-")[1];
                     String topic = first._1.split("-")[0];
 
-//                    if (topic.equals("Empatica")) {
-//                        if (key.equals("ACC")) {
-//                            try {
-//                            SparkUtils.process(records, ACC_Vector, somme, 0);
-//                            System.out.println("ACC : " + ACC_Vector);}
-//                            catch (Exception e){
-//                                e.printStackTrace();
-//                            }
-//                        } else if (key.equals("IBI")) {
-//                            //Get the value for which heartbeat duration is the longest
-//                            try {
-//                                SparkUtils.maxHeartbeat.call(first._2, records, IBI_Vector);
-//                                System.out.println("IBI : " + IBI_Vector);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                        } else {
-//                            switch (key) {
-//                                case "BVP":
-//                                    try {
-//                                    SparkUtils.process(records, BVP_Vector, somme, 0);
-//                                    System.out.println("BVP : " + BVP_Vector);}
-//                                    catch (Exception e){
-//                                        e.printStackTrace();
-//                                    }
-//                                    break;
-//                                case "EDA":
-//                                    try {
-//                                    SparkUtils.process(records, EDA_Vector, somme, 0);
-//                                    System.out.println("EDA : " + EDA_Vector); }
-//                                    catch (Exception e){
-//                                        e.printStackTrace();
-//                                    }
-//                                    break;
-//                                case "HR":
-//                                    try {
-//                                    SparkUtils.process(records, HR_Vector, somme, 0);
-//                                    System.out.println("HR : " + HR_Vector);}
-//                                    catch (Exception e){
-//                                        e.printStackTrace();
-//                                    }
-//                                    break;
-//                                case "TEMP":
-//                                    try {
-//                                    SparkUtils.process(records, TEMP_Vector, somme, 0);
-//                                    System.out.println("TEMP : " + TEMP_Vector);}
-//                                    catch (Exception e){
-//                                        e.printStackTrace();
-//                                    }
-//                                    break;
-//                            }
-//                        }
-//                    }
-//                    else if (topic.equals("Zephyr")) {
-//                        if (key.equals("BR_RR")) {
-//                            try {
-//                            SparkUtils.process(records, BR_RR_Vector, somme, 1);
-//                            System.out.println("BR_RR : " + BR_RR_Vector);}
-//                            catch (Exception e){
-//                                e.printStackTrace();
-//                            }
-//                        } else if (key.equals("ECG")) {
-//                            try {
-//                            SparkUtils.process(records, ECG_Vector, somme, 1);
-//                            System.out.println("ECG : " + ECG_Vector);}
-//                            catch (Exception e){
-//                                e.printStackTrace();
-//                            }
-//                        } else {
-//                            try{
-//                                SparkUtils.process_low_frequency(key, first, GENERAL_Vector, EVENT_DATA_Vector);
-//                            }
-//                            catch (Exception e){
-//                                e.printStackTrace();
-//                            }
-//                        }
-//                    }
-//                    else
-                        if (topic.equals("Aw")) {
+                    if (topic.equals("Empatica")) {
+                        if (key.equals("ACC")) {
+                            try {
+                            SparkUtils.processWithClustering(records, ACC_Vector, somme, 0);
+                            System.out.println("ACC : " + ACC_Vector);}
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        } else if (key.equals("IBI")) {
+                            //Get the value for which heartbeat duration is the longest
+                            try {
+                                SparkUtils.maxHeartbeat.call(first._2, records, IBI_Vector);
+                                System.out.println("IBI : " + IBI_Vector);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            switch (key) {
+                                case "BVP":
+                                    try {
+                                    SparkUtils.processWithClustering(records, BVP_Vector, somme, 0);
+                                    System.out.println("BVP : " + BVP_Vector);}
+                                    catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    break;
+                                case "EDA":
+                                    try {
+                                    SparkUtils.processWithClustering(records, EDA_Vector, somme, 0);
+                                    System.out.println("EDA : " + EDA_Vector); }
+                                    catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    break;
+                                case "HR":
+                                    try {
+                                    SparkUtils.processWithClustering(records, HR_Vector, somme, 0);
+                                    System.out.println("HR : " + HR_Vector);}
+                                    catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    break;
+                                case "TEMP":
+                                    try {
+                                    SparkUtils.processWithClustering(records, TEMP_Vector, somme, 0);
+                                    System.out.println("TEMP : " + TEMP_Vector);}
+                                    catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                    else if (topic.equals("Zephyr")) {
+                        if (key.equals("BR_RR")) {
+                            try {
+                                String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
+                                SparkUtils.processWithClustering(records, BR_RR_Vector, cleaned_First, 1, first._2.length, 0 , (double) 30);
+                                System.out.println("BR_RR : " + BR_RR_Vector);}
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        } else if (key.equals("ECG")) {
+                            try {
+                                String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
+                                SparkUtils.processWithClustering(records, ECG_Vector, cleaned_First, 1, first._2.length, 0 , (double) 10);
+                            System.out.println("ECG : " + ECG_Vector);}
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try{
+                                SparkUtils.process_low_frequency(first._2,1, GENERAL_Vector);
+                                System.out.println("GENERAL : " + GENERAL_Vector);
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    else if (topic.equals("Aw")) {
                         //Because AW sensors always send one more empty column
                         String[] cleaned_First = Arrays.copyOfRange(first._2, 8, first._2.length - 1);
-                        SparkUtils.process(records, AW_VECTOR, cleaned_First, 8, 5 , (double) 300);
+                        SparkUtils.processWithClustering(records, AW_VECTOR, cleaned_First, 8, first._2.length - 1, 5 , (double) 300);
                         System.out.println("AW : " + AW_VECTOR);
 
                     }
-//                    else if (topic.equals("Camera")) {
-//                        SparkUtils.process_camera(first, records, CAMERA_VECTOR);
-//                        System.out.println("Camera : " + CAMERA_VECTOR.size());
-//                    }
+                    else if (topic.equals("Camera")) {
+                        SparkUtils.process_camera(first, records, CAMERA_VECTOR);
+                        System.out.println("Camera : " + CAMERA_VECTOR.size());
+                    }
 
 //                    else if(topic.equals("AirQuality")){
 //                            if(key.equals("Quantity")){
