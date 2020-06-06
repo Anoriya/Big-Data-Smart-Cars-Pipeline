@@ -15,12 +15,16 @@ import java.util.ArrayList;
 public class DistanceMetricNumbers implements DistanceMetric<ArrayList<Double>> {
 
     @Override
-    public double calculateDistance(int start ,ArrayList<Double> val1, ArrayList<Double> val2) throws DBSCANClusteringException {
+    public double calculateDistance(int start, ArrayList<Double> val1, ArrayList<Double> val2) throws DBSCANClusteringException {
         double Manhatan_distance = 0;
         for (int i = start; i < val1.size(); i++) {
-            Manhatan_distance += Math.pow(val1.get(i) - val2.get(i),2);
+            try {
+                Manhatan_distance += Math.pow(val1.get(i) - val2.get(i), 2);
+            } catch (Exception e) {
+                Manhatan_distance += 0;
+            }
         }
 //        System.out.println("DST " + Math.sqrt(Manhatan_distance)) ;
-        return Math.sqrt(Manhatan_distance);
+            return Math.sqrt(Manhatan_distance);
+        }
     }
-}

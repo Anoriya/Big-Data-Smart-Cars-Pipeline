@@ -64,7 +64,7 @@ public class TestDBSCAN {
             fail("Should not have failed on instantiation: " + e1);
         }
 
-        ArrayList<ArrayList<ArrayList<Double>>> result = null;
+        ArrayList<ArrayList<Double>> result = null;
 
         try {
             result = clusterer.performClustering();

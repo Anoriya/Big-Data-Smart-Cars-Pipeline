@@ -1,7 +1,6 @@
 package DBSCAN;
 
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -136,7 +135,7 @@ public class DBSCANClusterer<V> {
         for(int i=0; i<inputValues.size(); i++) {
             V candidate = inputValues.get(i);
 //            System.out.println("CAND " + candidate.toString());
-            if (metric.calculateDistance(0, p, candidate) <= 2500) {
+            if (metric.calculateDistance(0, p, candidate) <= epsilon) {
                 neighbours.add(candidate);
             }
         }
@@ -169,7 +168,7 @@ public class DBSCANClusterer<V> {
      * @return
      * @throws DBSCANClusteringException
      */
-    public ArrayList<ArrayList<V>> performClustering() throws DBSCANClusteringException {
+    public ArrayList<V> performClustering() throws DBSCANClusteringException {
 
         if (inputValues == null) {
             throw new DBSCANClusteringException("DBSCAN: List of input values is null.");
@@ -206,7 +205,6 @@ public class DBSCANClusterer<V> {
                 if (neighbours.size() >= minimumNumberOfClusterMembers) {
                     int ind = 0;
                     while (neighbours.size() > ind) {
-                        System.out.println("AH");
                         V r = neighbours.get(ind);
                         if (!visitedPoints.contains(r)) {
                             visitedPoints.add(r);
@@ -224,7 +222,16 @@ public class DBSCANClusterer<V> {
             }
             index++;
         }
-        return resultList;
+        // Returns the cluster with most data (excluding outliers)
+        var lambdaContext = new Object() {
+            ArrayList<V> max = resultList.get(0);
+        };
+        resultList.forEach(result -> {
+            if (result.size() > lambdaContext.max.size()){
+                lambdaContext.max = result;
+            }
+        });
+        return lambdaContext.max;
     }
 
 }

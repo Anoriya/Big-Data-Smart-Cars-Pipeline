@@ -71,7 +71,7 @@ public class SparkUtils implements Serializable {
         }
     };
 
-    final static Function1<String[], ArrayList<Double>> convertArrayOfStringsToDouble = new Function1<String[], ArrayList<Double>>() {
+    final public static Function1<String[], ArrayList<Double>> convertArrayOfStringsToDouble = new Function1<String[], ArrayList<Double>>() {
         @Override
         public ArrayList<Double> apply(String[] stringsArray) {
             ArrayList<Double> doublesArray = new ArrayList<Double>();
@@ -281,7 +281,7 @@ public class SparkUtils implements Serializable {
             fail("Should not have failed on instantiation: " + e1);
         }
 
-        ArrayList<ArrayList<ArrayList<Double>>> result = null;
+        ArrayList<ArrayList<Double>> result = null;
 
         try {
             result = clusterer.performClustering();
@@ -290,10 +290,6 @@ public class SparkUtils implements Serializable {
         }
 
         System.out.println("CLUSTERRRRRRRRRRR " + result.size());
-
-        result.forEach(resultt ->{
-            System.out.println("SIZEEEEEEEEEE " + resultt.size());
-        });
 
 
 //            try {

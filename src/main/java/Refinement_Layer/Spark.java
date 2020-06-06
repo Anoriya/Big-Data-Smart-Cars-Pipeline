@@ -19,7 +19,7 @@ public class Spark {
         JavaStreamingContext ssc = SparkConfig.getStreamingContext();
 
         Map<String, Object> kafkaParams = new HashMap<>();
-        kafkaParams.put("bootstrap.servers", "quickstart.cloudera:9092");
+        kafkaParams.put("bootstrap.servers", "localhost:9092");
         kafkaParams.put("key.deserializer", StringDeserializer.class);
         kafkaParams.put("value.deserializer", StringDeserializer.class);
         kafkaParams.put("group.id", "sparkxx");
