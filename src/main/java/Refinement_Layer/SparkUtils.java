@@ -372,24 +372,23 @@ public class SparkUtils implements Serializable {
             }
     }
 
-    public static void processLowFlow(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first){
+    public static void processLowFlow(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first) throws Exception {
         Double[] moyenne;
-        List<Double[]> data = new ArrayList<Double[]>();
+        ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
+        data.add(convertArrayOfStringsToDouble.apply(cleaned_first));
         records.forEachRemaining(record -> {
-            Double[] doulbeRecord = convertArrayOfStringsToDouble.apply(record._2);
-            data.add(doulbeRecord);
+            data.add(convertArrayOfStringsToDouble.apply(record._2));
         });
-        records.forEachRemaining(record -> {
-            try {
-                SparkUtils.sum.call(somme, record._2, size, start);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        moyenne = SparkUtils.moyenne.call(somme, size, start);
+        Double[] somme = null;
+        try {
+            somme = SparkUtils.sum.apply(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        moyenne = SparkUtils.moyenne.call(somme, data.size());
         vector.addAll(Arrays.asList(moyenne));
-
     }
+
 
     public static void processWithClustering(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first, Integer start, Integer end, Integer start_clustering, Double epsilon) throws Exception {
         Double[] moyenne;
