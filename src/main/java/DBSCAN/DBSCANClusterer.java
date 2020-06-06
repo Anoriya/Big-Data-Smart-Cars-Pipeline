@@ -8,25 +8,6 @@ import java.util.HashSet;
 
 /**
  * Implementation of density-based clustering algorithm DBSCAN.
- *
- * Original Publication:
- * Ester, Martin; Kriegel, Hans-Peter; Sander, J�rg; Xu, Xiaowei (1996).
- * Simoudis, Evangelos; Han, Jiawei; Fayyad, Usama M., eds.
- * A density-based algorithm for discovering clusters in large spatial
- * databases with noise. Proceedings of the Second International Conference
- * on Knowledge Discovery and Data Mining (KDD-96). AAAI Press. pp. 226-231
- *
- * Usage:
- * - Identify type of input values.
- * - Implement metric for input value type using DistanceMetric interface.
- * - Instantiate using {@link #DBSCANClusterer(Collection, int, double, DistanceMetric, int)}.
- * - Invoke {@link #performClustering()}.
- *
- * See tests and metrics for example implementation and use.
- *
- * @author <a href="mailto:cf@christopherfrantz.org">Christopher Frantz</a>
- * @version 0.1
- *
  * @param <V> Input value element type
  */
 public class DBSCANClusterer<V> implements Serializable {

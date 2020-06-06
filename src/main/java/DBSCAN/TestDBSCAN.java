@@ -13,8 +13,6 @@ import java.util.Random;
 /**
  * Unit tests for DBSCANClusterer
  *
- * @author <a href="mailto:cf@christopherfrantz.org">Christopher Frantz</a>
- * @version 0.1
  */
 public class TestDBSCAN {
 

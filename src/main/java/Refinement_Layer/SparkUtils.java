@@ -266,7 +266,7 @@ public class SparkUtils implements Serializable {
         //Storing kafka records into a data as an array list of points to perform clustering on
         records.forEachRemaining(record -> {
             try {
-                data.add(convertArrayOfStringsToDouble.apply(record._2));
+                data.add(convertArrayOfStringsToDouble.apply(Arrays.copyOf(record._2, record._2.length - 1)));
             }
             catch (Exception e){
                 e.printStackTrace();

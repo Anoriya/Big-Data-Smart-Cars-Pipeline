@@ -9,9 +9,6 @@ import java.util.ArrayList;
 
 /**
  * Distance metric implementation for numeric values.
- *
- * @author <a href="mailto:cf@christopherfrantz.org">Christopher Frantz</a>
- * @version 0.1
  */
 public class DistanceMetricNumbers implements DistanceMetric<ArrayList<Double>> {
 
