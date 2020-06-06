@@ -60,8 +60,6 @@ public class Spark {
                     Tuple2<String, String[]> first = records.next();
                     String key = first._1.split("-")[1];
                     String topic = first._1.split("-")[0];
-                    //Number of the records, will be used for average
-                    String[] somme = first._2;
 
 //                    if (topic.equals("Empatica")) {
 //                        if (key.equals("ACC")) {
@@ -143,8 +141,8 @@ public class Spark {
 //                    else
                         if (topic.equals("Aw")) {
                         //Because AW sensors always send one more empty column
-                        String[] finalSomme = Arrays.copyOf(somme, somme.length - 1);
-                        SparkUtils.process(records, AW_VECTOR, finalSomme, 8);
+                        String[] cleaned_First = Arrays.copyOf(first._2, first._2.length - 1);
+                        SparkUtils.process(records, AW_VECTOR, cleaned_First, 8, 13 , (double) 300);
                         System.out.println("AW : " + AW_VECTOR);
 
                     }

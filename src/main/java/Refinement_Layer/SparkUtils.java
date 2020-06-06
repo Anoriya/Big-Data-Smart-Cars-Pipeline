@@ -9,6 +9,7 @@ import org.apache.spark.api.java.function.Function3;
 import org.apache.spark.api.java.function.Function4;
 import scala.Function;
 import scala.Function1;
+import scala.Int;
 import scala.Tuple2;
 
 import java.io.Serializable;
@@ -23,35 +24,33 @@ import static org.junit.Assert.fail;
 public class SparkUtils implements Serializable {
 
 
-    final static Function4<String[], String[], AtomicReference<Double>, Integer, Void> sum = new Function4<String[], String[], AtomicReference<Double>, Integer, Void>() {
+    final static Function2<ArrayList<ArrayList<Double>>,Integer, Double[]> sum = new Function2<ArrayList<ArrayList<Double>>, Integer, Double[]>() {
         @Override
-        public Void call(String[] somme, String[] record, AtomicReference<Double> size, Integer start) throws Exception {
-            for (int i = start; i < somme.length; i++) {
-                try {
-                    somme[i] = String.valueOf((Double.parseDouble(somme[i]) + Double.parseDouble(record[i])));
-                } catch (NullPointerException | NumberFormatException e) {
-                    System.out.println(e.getMessage());
+        public Double[] call(ArrayList<ArrayList<Double>> datas, Integer start) throws Exception {
+            //Utile for getting the length in the for loop
+            int size = datas.get(0).size();
+            Double[] somme = new Double[size - start];
+            datas.forEach(data -> {
+                for (int i = start; i < size; i++) {
+                        somme[i - start] = somme[i - start] + data.get(i);
                 }
-            }
-            size.getAndSet((size.get() + 1));
-            return null;
+            });
+            return somme;
         }
     };
 
-    final static Function3<String[], AtomicReference<Double>, Integer, Double[]> moyenne = new Function3<String[], AtomicReference<Double>, Integer, Double[]>() {
+    final static Function3<Double[], Integer, Integer, Double[]> moyenne = new Function3<Double[], Integer, Integer, Double[]>() {
         @Override
-        public Double[] call(String[] somme, AtomicReference<Double> size, Integer start) throws Exception {
-            Double[] moyenne = new Double[somme.length - start];
-            for (int i = start; i < somme.length; i++) {
-                try {
-                    moyenne[i - start] = (Double.parseDouble(somme[i]) / size.get());
-                } catch (NullPointerException | NumberFormatException e) {
-                    moyenne[i - start] = 0.0;
-                }
+        public Double[] call(Double[] somme, Integer size, Integer start) throws Exception {
+            if(somme != null){
+            Double[] moyenne = new Double[somme.length];
+            for (int i = 0; i < somme.length; i++) {
+                    moyenne[i] = somme[i] / size;
             }
             return moyenne;
         }
-    };
+            return null;
+    }};
 
     final static Function3<String[], Iterator<Tuple2<String, String[]>>, List<Double>, Void> maxHeartbeat = new Function3<String[], Iterator<Tuple2<String, String[]>>, List<Double>, Void>() {
         @Override
@@ -257,14 +256,14 @@ public class SparkUtils implements Serializable {
         }
     }
 
-    public static void process(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] somme, Integer start) throws Exception {
-        AtomicReference<Double> size = new AtomicReference<>((double) 1);
+    public static void process(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first, Integer start_sum, Integer start_clustering, Double epsilon) throws Exception {
         Double[] moyenne;
         // Init points list
         ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
         // Add the first element coming from records.next()
-        data.add(convertArrayOfStringsToDouble.apply(somme));
+        data.add(convertArrayOfStringsToDouble.apply(cleaned_first));
 
+        //Storing kafka records into a data as an array list of points to perform clustering on
         records.forEachRemaining(record -> {
             try {
                 data.add(convertArrayOfStringsToDouble.apply(record._2));
@@ -276,28 +275,28 @@ public class SparkUtils implements Serializable {
 
         DBSCANClusterer<ArrayList<Double>> clusterer = null;
         try {
-            clusterer = new DBSCANClusterer<ArrayList<Double>>(data, 2, 300, new DistanceMetricNumbers(),13);
+            clusterer = new DBSCANClusterer<ArrayList<Double>>(data, 2, epsilon, new DistanceMetricNumbers(),start_clustering);
         } catch (DBSCANClusteringException e1) {
             fail("Should not have failed on instantiation: " + e1);
         }
 
-        ArrayList<ArrayList<Double>> result = null;
+        ArrayList<ArrayList<Double>> clustered_data = null;
 
         try {
-            result = clusterer.performClustering();
+            clustered_data = clusterer.performClustering();
         } catch (DBSCANClusteringException e) {
             fail("Should not have failed while performing clustering: " + e);
         }
 
-        System.out.println("CLUSTERRRRRRRRRRR " + result.size());
+        System.out.println("CLUSTERRRRRRRRRRR " + clustered_data.size());
 
-
-//            try {
-//                SparkUtils.sum.call(somme, record._2, size, start);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        moyenne = SparkUtils.moyenne.call(somme, size, start);
-//        vector.addAll(Arrays.asList(moyenne));
+        Double[] somme = null;
+        try {
+                somme = SparkUtils.sum.call(clustered_data, start_sum);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        moyenne = SparkUtils.moyenne.call(somme, clustered_data.size(), start_sum);
+        vector.addAll(Arrays.asList(moyenne));
     }
 }
