@@ -1,6 +1,7 @@
 package DBSCAN;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,7 +29,7 @@ import java.util.HashSet;
  *
  * @param <V> Input value element type
  */
-public class DBSCANClusterer<V> {
+public class DBSCANClusterer<V> implements Serializable {
 
     /** maximum distance of values to be considered as cluster */
     private double epsilon = 1f;

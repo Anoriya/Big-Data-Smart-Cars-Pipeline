@@ -4,6 +4,7 @@ package DBSCAN.metrics;
 import DBSCAN.DBSCANClusteringException;
 import DBSCAN.DistanceMetric;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
