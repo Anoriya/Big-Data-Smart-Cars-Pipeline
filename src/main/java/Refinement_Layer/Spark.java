@@ -141,8 +141,8 @@ public class Spark {
 //                    else
                         if (topic.equals("Aw")) {
                         //Because AW sensors always send one more empty column
-                        String[] cleaned_First = Arrays.copyOf(first._2, first._2.length - 1);
-                        SparkUtils.process(records, AW_VECTOR, cleaned_First, 8, 13 , (double) 300);
+                        String[] cleaned_First = Arrays.copyOfRange(first._2, 8, first._2.length - 1);
+                        SparkUtils.process(records, AW_VECTOR, cleaned_First, 8, 5 , (double) 300);
                         System.out.println("AW : " + AW_VECTOR);
 
                     }

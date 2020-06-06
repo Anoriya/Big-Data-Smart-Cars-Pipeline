@@ -24,24 +24,35 @@ import static org.junit.Assert.fail;
 public class SparkUtils implements Serializable {
 
 
-    final static Function2<ArrayList<ArrayList<Double>>,Integer, Double[]> sum = new Function2<ArrayList<ArrayList<Double>>, Integer, Double[]>() {
+    final static Function1<ArrayList<ArrayList<Double>>, Double[]> sum = new Function1<ArrayList<ArrayList<Double>>, Double[]>() {
         @Override
-        public Double[] call(ArrayList<ArrayList<Double>> datas, Integer start) throws Exception {
+        public Double[] apply(ArrayList<ArrayList<Double>> datas) {
             //Utile for getting the length in the for loop
             int size = datas.get(0).size();
-            Double[] somme = new Double[size - start];
+            System.out.println("SOZHHHHH " + size);
+            Double[] somme = new Double[size];
             datas.forEach(data -> {
-                for (int i = start; i < size; i++) {
-                        somme[i - start] = somme[i - start] + data.get(i);
+                for (int i = 0; i < size; i++) {
+                    somme[i] = somme[i] + data.get(i);
                 }
             });
             return somme;
         }
+
+        @Override
+        public <A> Function1<A, Double[]> compose(Function1<A, ArrayList<ArrayList<Double>>> g) {
+            return null;
+        }
+
+        @Override
+        public <A> Function1<ArrayList<ArrayList<Double>>, A> andThen(Function1<Double[], A> g) {
+            return null;
+        }
     };
 
-    final static Function3<Double[], Integer, Integer, Double[]> moyenne = new Function3<Double[], Integer, Integer, Double[]>() {
+    final static Function2<Double[], Integer, Double[]> moyenne = new Function2<Double[], Integer, Double[]>() {
         @Override
-        public Double[] call(Double[] somme, Integer size, Integer start) throws Exception {
+        public Double[] call(Double[] somme, Integer size) throws Exception {
             if(somme != null){
             Double[] moyenne = new Double[somme.length];
             for (int i = 0; i < somme.length; i++) {
@@ -256,7 +267,7 @@ public class SparkUtils implements Serializable {
         }
     }
 
-    public static void process(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first, Integer start_sum, Integer start_clustering, Double epsilon) throws Exception {
+    public static void process(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first,Integer start, Integer start_clustering, Double epsilon) throws Exception {
         Double[] moyenne;
         // Init points list
         ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
@@ -266,7 +277,7 @@ public class SparkUtils implements Serializable {
         //Storing kafka records into a data as an array list of points to perform clustering on
         records.forEachRemaining(record -> {
             try {
-                data.add(convertArrayOfStringsToDouble.apply(Arrays.copyOf(record._2, record._2.length - 1)));
+                data.add(convertArrayOfStringsToDouble.apply(Arrays.copyOfRange(record._2, start,record._2.length - 1)));
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -292,11 +303,11 @@ public class SparkUtils implements Serializable {
 
         Double[] somme = null;
         try {
-                somme = SparkUtils.sum.call(clustered_data, start_sum);
+                somme = SparkUtils.sum.apply(clustered_data);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        moyenne = SparkUtils.moyenne.call(somme, clustered_data.size(), start_sum);
+        moyenne = SparkUtils.moyenne.call(somme, clustered_data.size());
         vector.addAll(Arrays.asList(moyenne));
     }
 }
