@@ -224,15 +224,14 @@ public class DBSCANClusterer<V> implements Serializable {
             index++;
         }
         // Returns the cluster with most data (excluding outliers)
-        var lambdaContext = new Object() {
-            ArrayList<V> max = resultList.get(0);
-        };
+        ArrayList<V> [] max = new ArrayList[1];
+             max[0] = resultList.get(0);
         resultList.forEach(result -> {
-            if (result.size() > lambdaContext.max.size()){
-                lambdaContext.max = result;
+            if (result.size() > max[0].size()){
+                max[0] = result;
             }
         });
-        return lambdaContext.max;
+        return max[0];
     }
 
 }
