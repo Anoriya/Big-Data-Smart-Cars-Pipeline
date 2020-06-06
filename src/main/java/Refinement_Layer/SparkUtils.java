@@ -32,6 +32,7 @@ public class SparkUtils implements Serializable {
             System.out.println("SOZHHHHH " + size);
             Double[] somme = new Double[size];
             datas.forEach(data -> {
+                System.out.println("DATAA " + data);
                 for (int i = 0; i < size; i++) {
                     somme[i] = somme[i] + data.get(i);
                 }
