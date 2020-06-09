@@ -59,124 +59,126 @@ public class Spark {
                     String key = first._1.split("-")[1];
                     String topic = first._1.split("-")[0];
 
-                    if (topic.equals("Empatica")) {
-                        if (key.equals("ACC")) {
-                            try {
-                            SparkUtils.processLowFlow(records, ACC_Vector, first._2,0);
-                            System.out.println("ACC : " + ACC_Vector);}
-                            catch (Exception e){
-                                e.printStackTrace();
-                            }
-                        } else if (key.equals("IBI")) {
-                            //Get the value for which heartbeat duration is the longest
-                            try {
-                                SparkUtils.maxHeartbeat.call(first._2, records, IBI_Vector);
-                                System.out.println("IBI : " + IBI_Vector);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            switch (key) {
-                                case "BVP":
-                                    try {
-                                        SparkUtils.processLowFlow(records, BVP_Vector, first._2,0);
-                                    System.out.println("BVP : " + BVP_Vector);}
-                                    catch (Exception e){
-                                        e.printStackTrace();
-                                    }
-                                    break;
-                                case "EDA":
-                                    try {
-                                        SparkUtils.processLowFlow(records, EDA_Vector, first._2,0);
-                                    System.out.println("EDA : " + EDA_Vector); }
-                                    catch (Exception e){
-                                        e.printStackTrace();
-                                    }
-                                    break;
-                                case "HR":
-                                    try {
-                                        SparkUtils.processLowFlow(records, HR_Vector, first._2,0);
-                                    System.out.println("HR : " + HR_Vector);}
-                                    catch (Exception e){
-                                        e.printStackTrace();
-                                    }
-                                    break;
-                                case "TEMP":
-                                    try {
-                                        SparkUtils.processLowFlow(records, TEMP_Vector, first._2,0);
-                                    System.out.println("TEMP : " + TEMP_Vector);}
-                                    catch (Exception e){
-                                        e.printStackTrace();
-                                    }
-                                    break;
-                            }
-                        }
-                    }
-                    else if (topic.equals("Zephyr")) {
-                        if (key.equals("BR_RR")) {
-                            try {
-                                String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
-                                SparkUtils.processWithClustering(records, BR_RR_Vector, cleaned_First, 1, first._2.length, 0 , (double) 30);
-                                System.out.println("BR_RR : " + BR_RR_Vector);}
-                            catch (Exception e){
-                                e.printStackTrace();
-                            }
-                        } else if (key.equals("ECG")) {
-                            try {
-                                String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
-                                SparkUtils.processWithClustering(records, ECG_Vector, cleaned_First, 1, first._2.length, 0 , (double) 10);
-                            System.out.println("ECG : " + ECG_Vector);}
-                            catch (Exception e){
-                                e.printStackTrace();
-                            }
-                        } else {
-                            try{
-                                SparkUtils.process_low_frequency(first._2,1, GENERAL_Vector);
-                                System.out.println("GENERAL : " + GENERAL_Vector);
-                            }
-                            catch (Exception e){
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    else if (topic.equals("Aw")) {
-                        //Because AW sensors always send one more empty column
-                        String[] cleaned_First = Arrays.copyOfRange(first._2, 8, first._2.length - 1);
-                        SparkUtils.processWithClustering(records, AW_VECTOR, cleaned_First, 8, first._2.length - 1, 5 , (double) 300);
-                        System.out.println("AW : " + AW_VECTOR);
-
-                    }
-                    else if (topic.equals("Camera")) {
-                        SparkUtils.process_camera(first, records, CAMERA_VECTOR);
-                        System.out.println("Camera : " + CAMERA_VECTOR.size());
-                    }
-
-                    else if(topic.equals("AirQuality")){
-                        String[] cleaned_First = Arrays.copyOfRange(first._2, 2, first._2.length);
-                        if(key.equals("Quantity")){
+                    switch (topic) {
+                        case "Empatica":
+                            if (key.equals("ACC")) {
                                 try {
-                                    SparkUtils.processLowFlow(records, QUANTITY_Vector, cleaned_First,2);
-                                    System.out.println("Quantity : " + QUANTITY_Vector);}
-                                catch (Exception e){
+                                    SparkUtils.processLowFlow(records, ACC_Vector, first._2, 0);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else if (key.equals("IBI")) {
+                                //Get the value for which heartbeat duration is the longest
+                                try {
+                                    SparkUtils.maxHeartbeat.call(first._2, records, IBI_Vector);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                switch (key) {
+                                    case "BVP":
+                                        try {
+                                            SparkUtils.processLowFlow(records, BVP_Vector, first._2, 0);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                        break;
+                                    case "EDA":
+                                        try {
+                                            SparkUtils.processLowFlow(records, EDA_Vector, first._2, 0);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                        break;
+                                    case "HR":
+                                        try {
+                                            SparkUtils.processLowFlow(records, HR_Vector, first._2, 0);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                        break;
+                                    case "TEMP":
+                                        try {
+                                            SparkUtils.processLowFlow(records, TEMP_Vector, first._2, 0);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                        break;
+                                }
+                            }
+                            break;
+                        case "Zephyr":
+                            if (key.equals("BR_RR")) {
+                                try {
+                                    String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
+                                    SparkUtils.processWithClustering(records, BR_RR_Vector, cleaned_First, 1, first._2.length, 0, (double) 30);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else if (key.equals("ECG")) {
+                                try {
+                                    String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
+                                    SparkUtils.processWithClustering(records, ECG_Vector, cleaned_First, 1, first._2.length, 0, (double) 10);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                try {
+                                    SparkUtils.process_low_frequency(first._2, 1, GENERAL_Vector);
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             }
-                            else if (key.equals("Concentration")){
+                            break;
+                        case "Aw": {
+                            //Because AW sensors always send one more empty column
+                            String[] cleaned_First = Arrays.copyOfRange(first._2, 8, first._2.length - 1);
+                            SparkUtils.processWithClustering(records, AW_VECTOR, cleaned_First, 8, first._2.length - 1, 5, (double) 200);
+
+                            break;
+                        }
+                        case "Camera":
+                            SparkUtils.process_camera(first, records, CAMERA_VECTOR);
+                            break;
+                        case "AirQuality": {
+                            String[] cleaned_First = Arrays.copyOfRange(first._2, 2, first._2.length);
+                            if (key.equals("Quantity")) {
                                 try {
-                                    SparkUtils.processLowFlow(records, CONCENTRATION_Vector, cleaned_First,2);
-                                    System.out.println("CONCENTRATION : " + CONCENTRATION_Vector);}
-                                catch (Exception e){
+                                    SparkUtils.processLowFlow(records, QUANTITY_Vector, cleaned_First, 2);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else if (key.equals("Concentration")) {
+                                try {
+                                    SparkUtils.processLowFlow(records, CONCENTRATION_Vector, cleaned_First, 2);
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             }
 
+                            break;
                         }
+                    }
 
                 } catch (Exception e) {
                     System.out.println("EMPTYYY");
                 }
             });
         });
+        System.out.println("ACC : " + ACC_Vector);
+        System.out.println("IBI : " + IBI_Vector);
+        System.out.println("BVP : " + BVP_Vector);
+        System.out.println("EDA : " + EDA_Vector);
+        System.out.println("HR : " + HR_Vector);
+        System.out.println("TEMP : " + TEMP_Vector);
+        System.out.println("BR_RR : " + BR_RR_Vector);
+        System.out.println("ECG : " + ECG_Vector);
+        System.out.println("GENERAL : " + GENERAL_Vector);
+        System.out.println("AW : " + AW_VECTOR);
+        System.out.println("Camera : " + CAMERA_VECTOR.size());
+        System.out.println("Quantity : " + QUANTITY_Vector);
+        System.out.println("CONCENTRATION : " + CONCENTRATION_Vector);
+
 
 
         // Start the computation
