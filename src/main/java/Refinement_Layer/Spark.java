@@ -4,6 +4,7 @@ package Refinement_Layer;
 import org.apache.spark.streaming.api.java.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -47,7 +48,7 @@ public class Spark {
         List<Double> ECG_Vector = new ArrayList<Double>();
         List<Double> GENERAL_Vector = new ArrayList<Double>();
         List<Double> AW_VECTOR = new ArrayList<Double>();
-        List<String[]> CAMERA_VECTOR = new ArrayList<String[]>();
+        AtomicReference<List<String[]>> CAMERA_VECTOR = new AtomicReference<List<String[]>>();
         List<Double> QUANTITY_Vector = new ArrayList<Double>();
         List<Double> CONCENTRATION_Vector = new ArrayList<Double>();
 
@@ -137,7 +138,7 @@ public class Spark {
                             break;
                         }
                         case "Camera":
-                            SparkUtils.process_camera(first, records, CAMERA_VECTOR);
+                             CAMERA_VECTOR.set(SparkUtils.process_camera(first, records));
                             break;
                         case "AirQuality": {
                             String[] cleaned_First = Arrays.copyOfRange(first._2, 2, first._2.length);
@@ -162,20 +163,20 @@ public class Spark {
                 } catch (Exception e) {
                     System.out.println("EMPTYYY");
                 }
-                System.out.println("ACC : " + ACC_Vector);
-                System.out.println("IBI : " + IBI_Vector);
-                System.out.println("BVP : " + BVP_Vector);
-                System.out.println("EDA : " + EDA_Vector);
-                System.out.println("HR : " + HR_Vector);
-                System.out.println("TEMP : " + TEMP_Vector);
-                System.out.println("BR_RR : " + BR_RR_Vector);
-                System.out.println("ECG : " + ECG_Vector);
-                System.out.println("GENERAL : " + GENERAL_Vector);
-                System.out.println("AW : " + AW_VECTOR);
-                System.out.println("Camera : " + CAMERA_VECTOR.size());
-                System.out.println("Quantity : " + QUANTITY_Vector);
-                System.out.println("CONCENTRATION : " + CONCENTRATION_Vector);
             });
+            System.out.println("ACC : " + ACC_Vector);
+            System.out.println("IBI : " + IBI_Vector);
+            System.out.println("BVP : " + BVP_Vector);
+            System.out.println("EDA : " + EDA_Vector);
+            System.out.println("HR : " + HR_Vector);
+            System.out.println("TEMP : " + TEMP_Vector);
+            System.out.println("BR_RR : " + BR_RR_Vector);
+            System.out.println("ECG : " + ECG_Vector);
+            System.out.println("GENERAL : " + GENERAL_Vector);
+            System.out.println("AW : " + AW_VECTOR);
+            System.out.println("Camera : " + CAMERA_VECTOR.get().size());
+            System.out.println("Quantity : " + QUANTITY_Vector);
+            System.out.println("CONCENTRATION : " + CONCENTRATION_Vector);
         });
 
 

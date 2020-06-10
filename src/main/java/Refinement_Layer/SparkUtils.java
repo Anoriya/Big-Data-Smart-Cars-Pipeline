@@ -342,7 +342,8 @@ public class SparkUtils implements Serializable {
         }
     };
 
-    public static void process_camera(Tuple2<String, String[]> first, Iterator<Tuple2<String, String[]>> records, List<String[]> CAMERA_VECTOR) {
+    public static List<String[]> process_camera(Tuple2<String, String[]> first, Iterator<Tuple2<String, String[]>> records) {
+        List<String[]> CAMERA_VECTOR = new ArrayList<String[]>();
         //Treating first element
         try {
             if ((first._2[2].equals("PROCESSED")) && (first._2[3].equals("WORKING")) && (first._2[4].equals("True")))
@@ -358,6 +359,7 @@ public class SparkUtils implements Serializable {
                 e.printStackTrace();
             }
         });
+        return CAMERA_VECTOR;
     }
 
     public static void process_low_frequency(String[] first, Integer start, List<Double> Vector) {
