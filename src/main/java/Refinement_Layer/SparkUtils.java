@@ -4,7 +4,6 @@ import DBSCAN.DBSCANClusterer;
 import DBSCAN.DBSCANClusteringException;
 import DBSCAN.metrics.DistanceMetricNumbers;
 import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.Function3;
 import scala.Function1;
 import scala.Tuple2;
 
@@ -362,15 +361,18 @@ public class SparkUtils implements Serializable {
         return CAMERA_VECTOR;
     }
 
-    public static void process_low_frequency(String[] first, Integer start, List<Double> Vector) {
+    public static List<Double> process_low_frequency(String[] first, Integer start) {
+        List<Double> Vector = new ArrayList<Double>();
         try {
             //Removes the timestamp attribute
             String[] nonTimedRecord = Arrays.copyOfRange(first, start, first.length);
             ArrayList<Double> convertedArray = SparkUtils.convertArrayOfStringsToListOfDouble.apply(nonTimedRecord);
             Vector.addAll(convertedArray);
+            return Vector;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return Vector;
     }
 
     public static List<Double> processLowFlow(Iterator<Tuple2<String, String[]>> records, String[] cleaned_first, Integer start) throws Exception {
@@ -391,8 +393,9 @@ public class SparkUtils implements Serializable {
     }
 
 
-    public static void processWithClustering(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first, Integer start, Integer end, Integer start_clustering, Double epsilon) throws Exception {
+    public static List<Double> processWithClustering(Iterator<Tuple2<String, String[]>> records, String[] cleaned_first, Integer start, Integer end, Integer start_clustering, Double epsilon) throws Exception {
         Double[] moyenne;
+        List<Double> vector = new ArrayList<Double>();
         // Init points list
         ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
         // Add the first element coming from records.next()
@@ -434,5 +437,6 @@ public class SparkUtils implements Serializable {
         } else {
             vector.addAll(data.get(0));
         }
+        return vector;
     }
 }
