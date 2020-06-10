@@ -161,22 +161,24 @@ public class SparkUtils implements Serializable {
         }
 
         @Override
-        public void apply$mcVJ$sp(long l) {  }
+        public void apply$mcVJ$sp(long l) {
+        }
     };
 
     final static Function2<Double[], Integer, Double[]> moyenne = new Function2<Double[], Integer, Double[]>() {
         @Override
         public Double[] call(Double[] somme, Integer size) throws Exception {
-            if(somme != null){
-            Double[] moyenne = new Double[somme.length];
-            Arrays.fill(moyenne, 0.0);
+            if (somme != null) {
+                Double[] moyenne = new Double[somme.length];
+                Arrays.fill(moyenne, 0.0);
                 for (int i = 0; i < somme.length; i++) {
                     moyenne[i] = somme[i] / size;
+                }
+                return moyenne;
             }
-            return moyenne;
-        }
             return null;
-    }};
+        }
+    };
 
     final static Function3<String[], Iterator<Tuple2<String, String[]>>, List<Double>, Void> maxHeartbeat = new Function3<String[], Iterator<Tuple2<String, String[]>>, List<Double>, Void>() {
         @Override
@@ -336,10 +338,11 @@ public class SparkUtils implements Serializable {
         }
 
         @Override
-        public void apply$mcVJ$sp(long l) {  }
+        public void apply$mcVJ$sp(long l) {
+        }
     };
 
-    public static void process_camera(Tuple2<String, String[]> first, Iterator<Tuple2<String, String[]>> records, List<String[]> CAMERA_VECTOR){
+    public static void process_camera(Tuple2<String, String[]> first, Iterator<Tuple2<String, String[]>> records, List<String[]> CAMERA_VECTOR) {
         //Treating first element
         try {
             if ((first._2[2].equals("PROCESSED")) && (first._2[3].equals("WORKING")) && (first._2[4].equals("True")))
@@ -357,15 +360,15 @@ public class SparkUtils implements Serializable {
         });
     }
 
-    public static void process_low_frequency(String[] first, Integer start, List<Double> GENERAL_Vector) {
-            try {
-                //Removes the timestamp attribute
-                String[] nonTimedRecord = Arrays.copyOfRange(first, start, first.length);
-                ArrayList<Double> convertedArray = SparkUtils.convertArrayOfStringsToListOfDouble.apply(nonTimedRecord);
-                GENERAL_Vector.addAll(convertedArray);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    public static void process_low_frequency(String[] first, Integer start, List<Double> Vector) {
+        try {
+            //Removes the timestamp attribute
+            String[] nonTimedRecord = Arrays.copyOfRange(first, start, first.length);
+            ArrayList<Double> convertedArray = SparkUtils.convertArrayOfStringsToListOfDouble.apply(nonTimedRecord);
+            Vector.addAll(convertedArray);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void processLowFlow(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first, Integer start) throws Exception {
@@ -373,7 +376,7 @@ public class SparkUtils implements Serializable {
         ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
         data.add(convertArrayOfStringsToListOfDouble.apply(cleaned_first));
         records.forEachRemaining(record -> {
-            data.add(convertArrayOfStringsToListOfDouble.apply(Arrays.copyOfRange(record._2, start,record._2.length)));
+            data.add(convertArrayOfStringsToListOfDouble.apply(Arrays.copyOfRange(record._2, start, record._2.length)));
         });
         Double[] somme = null;
         try {
@@ -396,35 +399,38 @@ public class SparkUtils implements Serializable {
         //Storing kafka records into a data as an array list of points to perform clustering on
         records.forEachRemaining(record -> {
             try {
-                data.add(convertArrayOfStringsToListOfDouble.apply(Arrays.copyOfRange(record._2, start,end)));
-            }
-            catch (Exception e){
+                data.add(convertArrayOfStringsToListOfDouble.apply(Arrays.copyOfRange(record._2, start, end)));
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
-        DBSCANClusterer<ArrayList<Double>> clusterer = null;
-        try {
-            clusterer = new DBSCANClusterer<ArrayList<Double>>(data, 2, epsilon, new DistanceMetricNumbers(),start_clustering);
-        } catch (DBSCANClusteringException e1) {
-            fail("Should not have failed on instantiation: " + e1);
-        }
+        if (data.size() > 1) {
+            DBSCANClusterer<ArrayList<Double>> clusterer = null;
+            try {
+                clusterer = new DBSCANClusterer<ArrayList<Double>>(data, 2, epsilon, new DistanceMetricNumbers(), start_clustering);
+            } catch (DBSCANClusteringException e1) {
+                fail("Should not have failed on instantiation: " + e1);
+            }
 
-        ArrayList<ArrayList<Double>> clustered_data = null;
+            ArrayList<ArrayList<Double>> clustered_data = null;
 
-        try {
-            clustered_data = clusterer.performClustering();
-        } catch (DBSCANClusteringException e) {
-            fail("Should not have failed while performing clustering: " + e);
-        }
+            try {
+                clustered_data = clusterer.performClustering();
+            } catch (DBSCANClusteringException e) {
+                fail("Should not have failed while performing clustering: " + e);
+            }
 
-        Double[] somme = null;
-        try {
+            Double[] somme = null;
+            try {
                 somme = SparkUtils.sum.apply(clustered_data);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        moyenne = SparkUtils.moyenne.call(somme, clustered_data.size());
-        vector.addAll(Arrays.asList(moyenne));
+            moyenne = SparkUtils.moyenne.call(somme, clustered_data.size());
+            vector.addAll(Arrays.asList(moyenne));
+        } else {
+            vector.addAll(data.get(0));
+        }
     }
 }
