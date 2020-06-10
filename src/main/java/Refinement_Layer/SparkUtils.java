@@ -416,7 +416,7 @@ public class SparkUtils implements Serializable {
                 clusterer = new DBSCANClusterer<ArrayList<Double>>(data, 2, epsilon, new DistanceMetricNumbers(), start_clustering);
             } catch (DBSCANClusteringException e1) {
                 fail("Should not have failed on instantiation: " + e1);
-            }
+            }public static final
 
             ArrayList<ArrayList<Double>> clustered_data = null;
 

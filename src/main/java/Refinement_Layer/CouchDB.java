@@ -44,6 +44,10 @@ public class CouchDB {
     public static void createDocument(Map<String, Object> doc) throws MalformedURLException {
         getDb().createDatabaseIfNotExists();
         getDb().create(doc);
+    }
 
+    public static void createDocumentMapped(Map<String, Map<String, Double>> doc) throws MalformedURLException {
+        getDb().createDatabaseIfNotExists();
+        getDb().create(doc);
     }
 }
