@@ -180,10 +180,10 @@ public class SparkUtils implements Serializable {
         }
     };
 
-    final static Function3<String[], Iterator<Tuple2<String, String[]>>, List<Double>, Void> maxHeartbeat = new Function3<String[], Iterator<Tuple2<String, String[]>>, List<Double>, Void>() {
-        @Override
-        public Void call(String[] first, Iterator<Tuple2<String, String[]>> records, List<Double> vector) throws Exception {
+    final static Function2<String[], Iterator<Tuple2<String, String[]>>, List<Double>> maxHeartbeat = new Function3<String[], Iterator<Tuple2<String, String[]>>, List<Double>>() {
+        public List<Double> call(String[] first, Iterator<Tuple2<String, String[]>> records) throws Exception {
             AtomicReference<Tuple2<Double, Double>> max = new AtomicReference<>(new Tuple2<>(Double.parseDouble(first[0]), Double.parseDouble(first[1])));
+            List<Double> vector = new ArrayList<Double>();
             try {
                 records.forEachRemaining(record -> {
                     if (Double.parseDouble(record._2[1]) > max.get()._2) {
@@ -194,7 +194,7 @@ public class SparkUtils implements Serializable {
             } catch (Exception e) {
                 vector.addAll(Arrays.asList(0.0, 0.0));
             }
-            return null;
+            return vector;
         }
     };
 
@@ -373,7 +373,7 @@ public class SparkUtils implements Serializable {
         }
     }
 
-    public static void processLowFlow(Iterator<Tuple2<String, String[]>> records, List<Double> vector, String[] cleaned_first, Integer start) throws Exception {
+    public static List<Double> processLowFlow(Iterator<Tuple2<String, String[]>> records, String[] cleaned_first, Integer start) throws Exception {
         Double[] moyenne;
         ArrayList<ArrayList<Double>> data = new ArrayList<ArrayList<Double>>();
         data.add(convertArrayOfStringsToListOfDouble.apply(cleaned_first));
@@ -387,7 +387,7 @@ public class SparkUtils implements Serializable {
             e.printStackTrace();
         }
         moyenne = SparkUtils.moyenne.call(somme, data.size());
-        vector.addAll(Arrays.asList(moyenne));
+        return new ArrayList<Double>(Arrays.asList(moyenne));
     }
 
 

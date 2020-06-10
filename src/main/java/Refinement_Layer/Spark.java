@@ -18,8 +18,21 @@ public class Spark {
 
         JavaStreamingContext ssc = SparkConfig.getStreamingContext();
 
-        ListAccumulator CAMERA_VECTOR = new ListAccumulator();
-        ssc.ssc().sparkContext().register(CAMERA_VECTOR, "camera");
+        //Camera accum
+        ListAccumulator CAMERA_ACCUM = new ListAccumulator();
+        ssc.ssc().sparkContext().register(CAMERA_ACCUM, "camera");
+        //Empatica accum
+        ListAccumulator EMPATICA_ACCUM = new ListAccumulator();
+        ssc.ssc().sparkContext().register(EMPATICA_ACCUM, "Empatica");
+        //Zephyr accum
+        ListAccumulator ZEPHYR_ACCUM = new ListAccumulator();
+        ssc.ssc().sparkContext().register(ZEPHYR_ACCUM, "Zephyr");
+        //AirQ accum
+        ListAccumulator AIRQ_ACCUM = new ListAccumulator();
+        ssc.ssc().sparkContext().register(AIRQ_ACCUM, "AirQuality");
+        //Aw accum
+        ListAccumulator AW_ACCUM = new ListAccumulator();
+        ssc.ssc().sparkContext().register(AW_ACCUM, "Aw");
 
         Map<String, Object> kafkaParams = new HashMap<>();
         kafkaParams.put("bootstrap.servers", "quickstart.cloudera:9092");
@@ -29,7 +42,7 @@ public class Spark {
         kafkaParams.put("auto.offset.reset", "earliest");
         kafkaParams.put("enable.auto.commit", true);
 
-        Collection<String> topics = Arrays.asList("Aw", "Zephyr", "Camera", "Empatica","AirQuality");
+        Collection<String> topics = Arrays.asList("Aw", "Zephyr", "Camera", "Empatica", "AirQuality");
 
         JavaInputDStream<ConsumerRecord<String, String>> stream = KafkaUtils.createDirectStream(
                 ssc,
@@ -40,19 +53,19 @@ public class Spark {
         JavaPairDStream<String, String[]> topic_value = stream.mapToPair(record -> new Tuple2<>(record.topic() + "-" + record.key(), record.value().split(";")));
 
         //        JavaPairDStream<String, Integer> topic_count = topic_pairs.reduceByKey(reduceSumFunc);
-        //Vectors that will be passed to the model
-        List<Double> ACC_Vector = new ArrayList<Double>();
-        List<Double> IBI_Vector = new ArrayList<Double>();
-        List<Double> EDA_Vector = new ArrayList<Double>();
-        List<Double> HR_Vector = new ArrayList<Double>();
-        List<Double> TEMP_Vector = new ArrayList<Double>();
-        List<Double> BVP_Vector = new ArrayList<Double>();
-        List<Double> BR_RR_Vector = new ArrayList<Double>();
-        List<Double> ECG_Vector = new ArrayList<Double>();
-        List<Double> GENERAL_Vector = new ArrayList<Double>();
-        List<Double> AW_VECTOR = new ArrayList<Double>();
-        List<Double> QUANTITY_Vector = new ArrayList<Double>();
-        List<Double> CONCENTRATION_Vector = new ArrayList<Double>();
+//        //Vectors that will be passed to the model
+//        List<Double> ACC_Vector = new ArrayList<Double>();
+//        List<Double> IBI_Vector = new ArrayList<Double>();
+//        List<Double> EDA_Vector = new ArrayList<Double>();
+//        List<Double> HR_Vector = new ArrayList<Double>();
+//        List<Double> TEMP_Vector = new ArrayList<Double>();
+//        List<Double> BVP_Vector = new ArrayList<Double>();
+//        List<Double> BR_RR_Vector = new ArrayList<Double>();
+//        List<Double> ECG_Vector = new ArrayList<Double>();
+//        List<Double> GENERAL_Vector = new ArrayList<Double>();
+//        List<Double> AW_VECTOR = new ArrayList<Double>();
+//        List<Double> QUANTITY_Vector = new ArrayList<Double>();
+//        List<Double> CONCENTRATION_Vector = new ArrayList<Double>();
 
         topic_value.foreachRDD(rdd -> {
             rdd.foreachPartition(records -> {
@@ -66,14 +79,14 @@ public class Spark {
                         case "Empatica":
                             if (key.equals("ACC")) {
                                 try {
-                                    SparkUtils.processLowFlow(records, ACC_Vector, first._2, 0);
+                                    EMPATICA_ACCUM.add_to_map("ACC", SparkUtils.processLowFlow(records, first._2, 0));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             } else if (key.equals("IBI")) {
                                 //Get the value for which heartbeat duration is the longest
                                 try {
-                                    SparkUtils.maxHeartbeat.call(first._2, records, IBI_Vector);
+                                    EMPATICA_ACCUM.add_to_map("IBI", SparkUtils.maxHeartbeat.call(first._2, records));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -81,28 +94,28 @@ public class Spark {
                                 switch (key) {
                                     case "BVP":
                                         try {
-                                            SparkUtils.processLowFlow(records, BVP_Vector, first._2, 0);
+                                            EMPATICA_ACCUM.add_to_map("BVP", SparkUtils.processLowFlow(records, first._2, 0));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                         break;
                                     case "EDA":
                                         try {
-                                            SparkUtils.processLowFlow(records, EDA_Vector, first._2, 0);
+                                            EMPATICA_ACCUM.add_to_map("EDA", SparkUtils.processLowFlow(records, first._2, 0));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                         break;
                                     case "HR":
                                         try {
-                                            SparkUtils.processLowFlow(records, HR_Vector, first._2, 0);
+                                            EMPATICA_ACCUM.add_to_map("HR", SparkUtils.processLowFlow(records, first._2, 0));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                         break;
                                     case "TEMP":
                                         try {
-                                            SparkUtils.processLowFlow(records, TEMP_Vector, first._2, 0);
+                                            EMPATICA_ACCUM.add_to_map("TEMP", SparkUtils.processLowFlow(records, first._2, 0));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
@@ -110,78 +123,69 @@ public class Spark {
                                 }
                             }
                             break;
-                        case "Zephyr":
-                            if (key.equals("BR_RR")) {
-                                try {
-                                    String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
-                                    SparkUtils.processWithClustering(records, BR_RR_Vector, cleaned_First, 1, first._2.length, 0, (double) 30);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            } else if (key.equals("ECG")) {
-                                try {
-                                    String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
-                                    SparkUtils.processWithClustering(records, ECG_Vector, cleaned_First, 1, first._2.length, 0, (double) 10);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                try {
-                                    SparkUtils.process_low_frequency(first._2, 1, GENERAL_Vector);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            break;
-                        case "Aw": {
-                            //Because AW sensors always send one more empty column
-                            String[] cleaned_First = Arrays.copyOfRange(first._2, 8, first._2.length - 1);
-                            SparkUtils.processWithClustering(records, AW_VECTOR, cleaned_First, 8, first._2.length - 1, 5, (double) 200);
-                            break;
-                        }
-                        case "Camera":
-                             CAMERA_VECTOR.add(SparkUtils.process_camera(first, records));
-                            break;
-                        case "AirQuality": {
-                            String[] cleaned_First = Arrays.copyOfRange(first._2, 2, first._2.length);
-                            if (key.equals("Quantity")) {
-                                try {
-                                    SparkUtils.processLowFlow(records, QUANTITY_Vector, cleaned_First, 2);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            } else if (key.equals("Concentration")) {
-                                try {
-                                    SparkUtils.processLowFlow(records, CONCENTRATION_Vector, cleaned_First, 2);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            break;
-                        }
+//                        case "Zephyr":
+//                            if (key.equals("BR_RR")) {
+//                                try {
+//                                    String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
+//                                    SparkUtils.processWithClustering(records, BR_RR_Vector, cleaned_First, 1, first._2.length, 0, (double) 30);
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            } else if (key.equals("ECG")) {
+//                                try {
+//                                    String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
+//                                    SparkUtils.processWithClustering(records, ECG_Vector, cleaned_First, 1, first._2.length, 0, (double) 10);
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            } else {
+//                                try {
+//                                    SparkUtils.process_low_frequency(first._2, 1, GENERAL_Vector);
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                            break;
+//                        case "Aw": {
+//                            //Because AW sensors always send one more empty column
+//                            String[] cleaned_First = Arrays.copyOfRange(first._2, 8, first._2.length - 1);
+//                            SparkUtils.processWithClustering(records, AW_VECTOR, cleaned_First, 8, first._2.length - 1, 5, (double) 200);
+//                            break;
+//                        }
+//                        case "Camera":
+//                            CAMERA_VECTOR.add(SparkUtils.process_camera(first, records));
+//                            break;
+//                        case "AirQuality": {
+//                            String[] cleaned_First = Arrays.copyOfRange(first._2, 2, first._2.length);
+//                            if (key.equals("Quantity")) {
+//                                try {
+//                                    SparkUtils.processLowFlow(records, QUANTITY_Vector, cleaned_First, 2);
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            } else if (key.equals("Concentration")) {
+//                                try {
+//                                    SparkUtils.processLowFlow(records, CONCENTRATION_Vector, cleaned_First, 2);
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//
+//                            break;
+//                        }
                     }
 
                 } catch (Exception e) {
                     System.out.println("EMPTYYY");
                 }
             });
-            System.out.println("ACC : " + ACC_Vector);
-            System.out.println("IBI : " + IBI_Vector);
-            System.out.println("BVP : " + BVP_Vector);
-            System.out.println("EDA : " + EDA_Vector);
-            System.out.println("HR : " + HR_Vector);
-            System.out.println("TEMP : " + TEMP_Vector);
-            System.out.println("BR_RR : " + BR_RR_Vector);
-            System.out.println("ECG : " + ECG_Vector);
-            System.out.println("GENERAL : " + GENERAL_Vector);
-            System.out.println("AW : " + AW_VECTOR);
-            System.out.println("Camera : " + CAMERA_VECTOR.value().size());
-            System.out.println("Quantity : " + QUANTITY_Vector);
-            System.out.println("CONCENTRATION : " + CONCENTRATION_Vector);
+            System.out.println("EMPATICA : " + EMPATICA_ACCUM.value());
+            try {
+            CouchDB.createDocument(EMPATICA_ACCUM.value()); }
+            catch (Exception e){
+                System.out.println("Ta7che");
+            }
         });
-
-
 
 
         // Start the computation

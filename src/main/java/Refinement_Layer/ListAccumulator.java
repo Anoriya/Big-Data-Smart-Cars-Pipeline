@@ -2,11 +2,12 @@ package Refinement_Layer;
 
 import org.apache.spark.util.AccumulatorV2;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ListAccumulator extends AccumulatorV2<List<String[]>,List<String[]>> {
-    List<String[]> list = new ArrayList<String[]>();
+public class ListAccumulator extends AccumulatorV2<List<Double[]>,Map<String, Object>> {
+    Map<String, Object> map = new HashMap<String, Object>();
 
     public ListAccumulator() {
         super();
@@ -14,33 +15,34 @@ public class ListAccumulator extends AccumulatorV2<List<String[]>,List<String[]>
 
     @Override
     public boolean isZero() {
-        return list.isEmpty();
+        return map.isEmpty();
     }
 
     @Override
-    public AccumulatorV2<List<String[]>, List<String[]>> copy() {
-        ListAccumulator tmp = new ListAccumulator();
-        tmp.list.addAll(list);
-        return tmp;
+    public AccumulatorV2<List<Double[]>, Map<String, Object>> copy() {
+        return new ListAccumulator();
     }
 
     @Override
     public void reset() {
-        list.clear();
+        map.clear();
     }
 
     @Override
-    public void add(List<String[]> v) {
-        list.addAll(v);
+    public void add(List<Double[]> v) {
+            }
+    
+    public void add_to_map(String key, List<Double> vector){
+        map.put(key, vector);
     }
 
     @Override
-    public void merge(AccumulatorV2<List<String[]>,List<String[]>> other) {
-        list.addAll(other.value());
+    public void merge(AccumulatorV2<List<Double[]>, Map<String, Object>> other) {
+        this.map.putAll(other.value());
     }
 
     @Override
-    public List<String[]> value() {
-        return list;
+    public Map<String, Object> value() {
+        return map;
     }
 }
