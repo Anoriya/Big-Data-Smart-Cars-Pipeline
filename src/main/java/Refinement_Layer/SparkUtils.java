@@ -180,7 +180,7 @@ public class SparkUtils implements Serializable {
         }
     };
 
-    final static Function2<String[], Iterator<Tuple2<String, String[]>>, List<Double>> maxHeartbeat = new Function3<String[], Iterator<Tuple2<String, String[]>>, List<Double>>() {
+    final static Function2<String[], Iterator<Tuple2<String, String[]>>, List<Double>> maxHeartbeat = new Function2<String[], Iterator<Tuple2<String, String[]>>, List<Double>>() {
         public List<Double> call(String[] first, Iterator<Tuple2<String, String[]>> records) throws Exception {
             AtomicReference<Tuple2<Double, Double>> max = new AtomicReference<>(new Tuple2<>(Double.parseDouble(first[0]), Double.parseDouble(first[1])));
             List<Double> vector = new ArrayList<Double>();
