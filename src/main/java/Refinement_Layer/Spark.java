@@ -164,20 +164,21 @@ public class Spark {
                     System.out.println("EMPTYYY");
                 }
             });
+            System.out.println("ACC : " + ACC_Vector);
+            System.out.println("IBI : " + IBI_Vector);
+            System.out.println("BVP : " + BVP_Vector);
+            System.out.println("EDA : " + EDA_Vector);
+            System.out.println("HR : " + HR_Vector);
+            System.out.println("TEMP : " + TEMP_Vector);
+            System.out.println("BR_RR : " + BR_RR_Vector);
+            System.out.println("ECG : " + ECG_Vector);
+            System.out.println("GENERAL : " + GENERAL_Vector);
+            System.out.println("AW : " + AW_VECTOR);
+            System.out.println("Camera : " + CAMERA_VECTOR.size());
+            System.out.println("Quantity : " + QUANTITY_Vector);
+            System.out.println("CONCENTRATION : " + CONCENTRATION_Vector);
         });
-        System.out.println("ACC : " + ACC_Vector);
-        System.out.println("IBI : " + IBI_Vector);
-        System.out.println("BVP : " + BVP_Vector);
-        System.out.println("EDA : " + EDA_Vector);
-        System.out.println("HR : " + HR_Vector);
-        System.out.println("TEMP : " + TEMP_Vector);
-        System.out.println("BR_RR : " + BR_RR_Vector);
-        System.out.println("ECG : " + ECG_Vector);
-        System.out.println("GENERAL : " + GENERAL_Vector);
-        System.out.println("AW : " + AW_VECTOR);
-        System.out.println("Camera : " + CAMERA_VECTOR.size());
-        System.out.println("Quantity : " + QUANTITY_Vector);
-        System.out.println("CONCENTRATION : " + CONCENTRATION_Vector);
+
 
 
 
