@@ -23,7 +23,7 @@ public class Spark {
         kafkaParams.put("value.deserializer", StringDeserializer.class);
         kafkaParams.put("group.id", "sparkxx");
         kafkaParams.put("auto.offset.reset", "earliest");
-        kafkaParams.put("enable.auto.commit", false);
+        kafkaParams.put("enable.auto.commit", true);
 
         Collection<String> topics = Arrays.asList("Aw", "Zephyr", "Camera", "Empatica","AirQuality");
 
