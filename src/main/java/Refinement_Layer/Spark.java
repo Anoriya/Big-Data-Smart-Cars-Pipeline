@@ -18,6 +18,9 @@ public class Spark {
 
         JavaStreamingContext ssc = SparkConfig.getStreamingContext();
 
+        ListAccumulator CAMERA_VECTOR = new ListAccumulator();
+        ssc.ssc().sparkContext().register(CAMERA_VECTOR, "camera");
+
         Map<String, Object> kafkaParams = new HashMap<>();
         kafkaParams.put("bootstrap.servers", "quickstart.cloudera:9092");
         kafkaParams.put("key.deserializer", StringDeserializer.class);
@@ -48,7 +51,6 @@ public class Spark {
         List<Double> ECG_Vector = new ArrayList<Double>();
         List<Double> GENERAL_Vector = new ArrayList<Double>();
         List<Double> AW_VECTOR = new ArrayList<Double>();
-        AtomicReference<List<String[]>> CAMERA_VECTOR = new AtomicReference<List<String[]>>();
         List<Double> QUANTITY_Vector = new ArrayList<Double>();
         List<Double> CONCENTRATION_Vector = new ArrayList<Double>();
 
@@ -138,7 +140,7 @@ public class Spark {
                             break;
                         }
                         case "Camera":
-                             CAMERA_VECTOR.set(SparkUtils.process_camera(first, records));
+                             CAMERA_VECTOR.add(SparkUtils.process_camera(first, records));
                             break;
                         case "AirQuality": {
                             String[] cleaned_First = Arrays.copyOfRange(first._2, 2, first._2.length);
@@ -174,7 +176,7 @@ public class Spark {
             System.out.println("ECG : " + ECG_Vector);
             System.out.println("GENERAL : " + GENERAL_Vector);
             System.out.println("AW : " + AW_VECTOR);
-            System.out.println("Camera : " + CAMERA_VECTOR.get().size());
+            System.out.println("Camera : " + CAMERA_VECTOR.value().size());
             System.out.println("Quantity : " + QUANTITY_Vector);
             System.out.println("CONCENTRATION : " + CONCENTRATION_Vector);
         });
