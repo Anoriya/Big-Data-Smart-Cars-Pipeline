@@ -8,10 +8,7 @@ import scala.Function1;
 import scala.Tuple2;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.fail;
@@ -438,5 +435,13 @@ public class SparkUtils implements Serializable {
             vector.addAll(data.get(0));
         }
         return vector;
+    }
+
+    public static Map<String, Double> CreateMap(String[] key, List<Double> value) {
+        Map<String, Double> map = new HashMap<String, Double>();
+        for (int i = 0; i < value.size(); i++) {
+            map.put(key[i], value.get(i));
+        }
+        return map;
     }
 }

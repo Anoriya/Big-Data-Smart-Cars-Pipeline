@@ -17,14 +17,6 @@ import scala.Tuple2;
 
 public class Spark {
 
-    public Map<String, Double> CreateMap(String[] key, List<Double> value) {
-        Map<String, Double> map = new HashMap<String, Double>();
-        for (int i = 0; i < value.size(); i++) {
-            map.put(key[i], value.get(i));
-        }
-        return map;
-    }
-
     public Spark() throws InterruptedException {
 
 
@@ -139,20 +131,20 @@ public class Spark {
                             if (key.equals("BR_RR")) {
                                 try {
                                     String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
-                                    ZEPHYR_ACCUM.add_to_map("BR_RR", CreateMap(Attributes.key_BR_RR, SparkUtils.processWithClustering(records, cleaned_First, 1, first._2.length, 0, (double) 30)));
+                                    ZEPHYR_ACCUM.add_to_map("BR_RR", SparkUtils.CreateMap(Attributes.key_BR_RR, SparkUtils.processWithClustering(records, cleaned_First, 1, first._2.length, 0, (double) 30)));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             } else if (key.equals("ECG")) {
                                 try {
                                     String[] cleaned_First = Arrays.copyOfRange(first._2, 1, first._2.length);
-                                    ZEPHYR_ACCUM.add_to_map("ECG", CreateMap(Attributes.key_ECG, SparkUtils.processWithClustering(records, cleaned_First, 1, first._2.length, 0, (double) 10)));
+                                    ZEPHYR_ACCUM.add_to_map("ECG", SparkUtils.CreateMap(Attributes.key_ECG, SparkUtils.processWithClustering(records, cleaned_First, 1, first._2.length, 0, (double) 10)));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             } else {
                                 try {
-                                    ZEPHYR_ACCUM.add_to_map("GENERAL", CreateMap(Attributes.key_General, SparkUtils.process_low_frequency(first._2, 1)));
+                                    ZEPHYR_ACCUM.add_to_map("GENERAL", SparkUtils.CreateMap(Attributes.key_General, SparkUtils.process_low_frequency(first._2, 1)));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
