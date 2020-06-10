@@ -1,10 +1,11 @@
 package Refinement_Layer;
 
 
+import Refinement_Layer.Accumulators.CameraAccumulator;
+import Refinement_Layer.Accumulators.ListAccumulator;
 import org.apache.spark.streaming.api.java.*;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -19,7 +20,7 @@ public class Spark {
         JavaStreamingContext ssc = SparkConfig.getStreamingContext();
 
         //Camera accum
-        ListAccumulator CAMERA_ACCUM = new ListAccumulator();
+        CameraAccumulator CAMERA_ACCUM = new CameraAccumulator();
         ssc.ssc().sparkContext().register(CAMERA_ACCUM, "camera");
         //Empatica accum
         ListAccumulator EMPATICA_ACCUM = new ListAccumulator();
