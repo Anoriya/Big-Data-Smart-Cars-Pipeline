@@ -6,6 +6,8 @@ import Refinement_Layer.Accumulators.CameraAccumulator;
 import Refinement_Layer.Accumulators.MapAccumulator;
 import org.apache.spark.streaming.api.java.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -192,17 +194,8 @@ public class Spark {
                     System.out.println("EMPTYYY");
                 }
             });
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("Emaptica", EMPATICA_ACCUM.value());
-            map.put("Zephyr", ZEPHYR_ACCUM.value());
-            map.put("AirQuality", AIRQ_ACCUM.value());
-            map.put("Aw", AW_ACCUM.value().get("AW"));
-            map.put("Camera", CAMERA_ACCUM.value());
-            try {
-                CouchDB.createDocument(map);
-            } catch (Exception e) {
-                System.out.println("Oops : " + e.getMessage());
-            }
+
+            SparkUtils.save_to_database(EMPATICA_ACCUM, ZEPHYR_ACCUM, AIRQ_ACCUM, CAMERA_ACCUM, AW_ACCUM);
         });
 
 

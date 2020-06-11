@@ -43,14 +43,6 @@ public class CouchDB {
         return db;
     }
 
-    public static void createDocumentOfListMapped(List<Map<String, String>> doc) throws MalformedURLException {
-        Map<String, List<Map<String, String>>> document = new HashMap<String, List<Map<String, String>>>();
-        document.put("Camera", doc);
-        getDb().createDatabaseIfNotExists();
-        System.out.println(document);
-        getDb().create(document);
-    }
-
     public static void createDocument(Map<String, Object> doc) throws MalformedURLException {
         getDb().createDatabaseIfNotExists();
         System.out.println(doc);

@@ -3,11 +3,15 @@ package Refinement_Layer;
 import DBSCAN.DBSCANClusterer;
 import DBSCAN.DBSCANClusteringException;
 import DBSCAN.metrics.DistanceMetricNumbers;
+import Refinement_Layer.Accumulators.CameraAccumulator;
+import Refinement_Layer.Accumulators.MapAccumulator;
 import org.apache.spark.api.java.function.Function2;
 import scala.Function1;
 import scala.Tuple2;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -446,19 +450,36 @@ public class SparkUtils implements Serializable {
                 map.put("Unknown", value.get(i));
             }
         }
-            return map;
-        }
+        return map;
+    }
 
     public static Map<String, String> createMapString(String[] key, String[] value) {
         Map<String, String> map = new HashMap<String, String>();
         for (int i = 0; i < value.length; i++) {
             try {
-            map.put(key[i], value[i]);
-        }
-            catch (Exception e){
+                map.put(key[i], value[i]);
+            } catch (Exception e) {
                 map.put("Unknown", value[i]);
             }
         }
         return map;
+    }
+
+    public static void save_to_database(MapAccumulator Empatica, MapAccumulator Zephyr, MapAccumulator Airq, CameraAccumulator Camera, MapAccumulator Aw) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
+        LocalDateTime date = LocalDateTime.now();
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> timeStampedMap = new HashMap<String, Object>();
+        map.put("Emaptica", Empatica.value());
+        map.put("Zephyr", Zephyr.value());
+        map.put("AirQuality", Airq.value());
+        map.put("Aw", Aw.value().get("AW"));
+        map.put("Camera", Camera.value());
+        timeStampedMap.put(formatter.format(date), map);
+        try {
+            CouchDB.createDocument(timeStampedMap);
+        } catch (Exception e) {
+            System.out.println("Oops : " + e.getMessage());
+        }
     }
 }
