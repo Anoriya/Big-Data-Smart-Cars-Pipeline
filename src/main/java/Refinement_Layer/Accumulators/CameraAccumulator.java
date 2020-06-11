@@ -4,9 +4,14 @@ import org.apache.spark.util.AccumulatorV2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class CameraAccumulator extends AccumulatorV2<List<String[]>,List<String[]>> {
-    List<String[]> list = new ArrayList<String[]>();
+import static Refinement_Layer.Accumulators.Attributes.key_Camera;
+import static Refinement_Layer.SparkUtils.CreateMap;
+import static Refinement_Layer.SparkUtils.createMapString;
+
+public class CameraAccumulator extends AccumulatorV2<List<String[]>,List<Map<String,String>>> {
+    List<Map<String,String>> list = new ArrayList<Map<String,String>>();
 
     public CameraAccumulator() {
         super();
@@ -18,7 +23,7 @@ public class CameraAccumulator extends AccumulatorV2<List<String[]>,List<String[
     }
 
     @Override
-    public AccumulatorV2<List<String[]>, List<String[]>> copy() {
+    public AccumulatorV2<List<String[]>, List<Map<String,String>>> copy() {
         CameraAccumulator tmp = new CameraAccumulator();
         tmp.list.addAll(list);
         return tmp;
@@ -31,16 +36,18 @@ public class CameraAccumulator extends AccumulatorV2<List<String[]>,List<String[
 
     @Override
     public void add(List<String[]> v) {
-        list.addAll(v);
+        for (int i=0;i<v.size();i++){
+            list.add(createMapString(key_Camera,v.get(i)));
+        }
     }
 
     @Override
-    public void merge(AccumulatorV2<List<String[]>,List<String[]>> other) {
+    public void merge(AccumulatorV2<List<String[]>,List<Map<String,String>>> other) {
         list.addAll(other.value());
     }
 
     @Override
-    public List<String[]> value() {
+    public List<Map<String,String>> value() {
         return list;
     }
 }
