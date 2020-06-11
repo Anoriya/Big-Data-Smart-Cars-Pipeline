@@ -9,6 +9,8 @@ import org.ektorp.impl.StdCouchDbConnector;
 import org.ektorp.impl.StdCouchDbInstance;
 
 import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CouchDB {
@@ -41,12 +43,15 @@ public class CouchDB {
         return db;
     }
 
-    public static void createDocument(Map<String, Object> doc) throws MalformedURLException {
+    public static void createDocumentOfListMapped(List<Map<String, String>> doc) throws MalformedURLException {
+        Map<String, List<Map<String, String>>> document = new HashMap<String, List<Map<String, String>>>();
+        document.put("Camera", doc);
         getDb().createDatabaseIfNotExists();
-        getDb().create(doc);
+        System.out.println(document);
+        getDb().create(document);
     }
 
-    public static void createDocumentMapped(Map<String, Map<String, Double>> doc) throws MalformedURLException {
+    public static void createDocument(Map<String, Map<String, Double>> doc) throws MalformedURLException {
         getDb().createDatabaseIfNotExists();
         System.out.println(doc);
         getDb().create(doc);

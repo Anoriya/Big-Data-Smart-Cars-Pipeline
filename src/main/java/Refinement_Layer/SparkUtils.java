@@ -437,18 +437,27 @@ public class SparkUtils implements Serializable {
         return vector;
     }
 
-    public static Map<String, Double> CreateMap(String[] key, List<Double> value) {
+    public static Map<String, Double> createMap(String[] key, List<Double> value) {
         Map<String, Double> map = new HashMap<String, Double>();
         for (int i = 0; i < value.size(); i++) {
-            map.put(key[i], value.get(i));
+            try {
+                map.put(key[i], value.get(i));
+            } catch (Exception e) {
+                map.put("Unknown", value.get(i));
+            }
         }
-        return map;
-    }
+            return map;
+        }
 
     public static Map<String, String> createMapString(String[] key, String[] value) {
         Map<String, String> map = new HashMap<String, String>();
         for (int i = 0; i < value.length; i++) {
+            try {
             map.put(key[i], value[i]);
+        }
+            catch (Exception e){
+                map.put("Unknown", value[i]);
+            }
         }
         return map;
     }

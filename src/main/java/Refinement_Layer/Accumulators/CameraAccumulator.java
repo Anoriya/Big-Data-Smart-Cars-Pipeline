@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import static Refinement_Layer.Accumulators.Attributes.key_Camera;
-import static Refinement_Layer.SparkUtils.CreateMap;
 import static Refinement_Layer.SparkUtils.createMapString;
 
 public class CameraAccumulator extends AccumulatorV2<List<String[]>,List<Map<String,String>>> {
