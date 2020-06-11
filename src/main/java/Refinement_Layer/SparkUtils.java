@@ -439,7 +439,6 @@ public class SparkUtils implements Serializable {
 
     public static Map<String, Double> CreateMap(String[] key, List<Double> value) {
         Map<String, Double> map = new HashMap<String, Double>();
-        System.out.println("SIZEEEEEEEE  " + key[0] + value.size());
         for (int i = 0; i < value.size(); i++) {
             map.put(key[i], value.get(i));
         }

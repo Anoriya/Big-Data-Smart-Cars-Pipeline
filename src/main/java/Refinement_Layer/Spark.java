@@ -26,7 +26,7 @@ public class Spark {
         CameraAccumulator CAMERA_ACCUM = new CameraAccumulator();
         ssc.ssc().sparkContext().register(CAMERA_ACCUM, "camera");
         //Empatica accum
-        ListAccumulator EMPATICA_ACCUM = new ListAccumulator();
+        MapAccumulator EMPATICA_ACCUM = new MapAccumulator();
         ssc.ssc().sparkContext().register(EMPATICA_ACCUM, "Empatica");
         //Zephyr accum
         MapAccumulator ZEPHYR_ACCUM = new MapAccumulator();
@@ -35,7 +35,7 @@ public class Spark {
         ListAccumulator AIRQ_ACCUM = new ListAccumulator();
         ssc.ssc().sparkContext().register(AIRQ_ACCUM, "AirQuality");
         //Aw accum
-        ListAccumulator AW_ACCUM = new ListAccumulator();
+        MapAccumulator AW_ACCUM = new MapAccumulator();
         ssc.ssc().sparkContext().register(AW_ACCUM, "Aw");
 
         Map<String, Object> kafkaParams = new HashMap<>();
@@ -85,14 +85,14 @@ public class Spark {
                         case "Empatica":
                             if (key.equals("ACC")) {
                                 try {
-                                    EMPATICA_ACCUM.add_to_map("ACC", SparkUtils.processLowFlow(records, first._2, 0));
+                                    EMPATICA_ACCUM.add_to_map("ACC", SparkUtils.CreateMap(Attributes.key_Empatica,SparkUtils.processLowFlow(records, first._2, 0)));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             } else if (key.equals("IBI")) {
                                 //Get the value for which heartbeat duration is the longest
                                 try {
-                                    EMPATICA_ACCUM.add_to_map("IBI", SparkUtils.maxHeartbeat.call(first._2, records));
+                                    EMPATICA_ACCUM.add_to_map("IBI", SparkUtils.CreateMap(Attributes.key_Empatica,SparkUtils.maxHeartbeat.call(first._2, records)));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -100,28 +100,28 @@ public class Spark {
                                 switch (key) {
                                     case "BVP":
                                         try {
-                                            EMPATICA_ACCUM.add_to_map("BVP", SparkUtils.processLowFlow(records, first._2, 0));
+                                            EMPATICA_ACCUM.add_to_map("BVP", SparkUtils.CreateMap(Attributes.key_Empatica,SparkUtils.processLowFlow(records, first._2, 0)));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                         break;
                                     case "EDA":
                                         try {
-                                            EMPATICA_ACCUM.add_to_map("EDA", SparkUtils.processLowFlow(records, first._2, 0));
+                                            EMPATICA_ACCUM.add_to_map("EDA", SparkUtils.CreateMap(Attributes.key_Empatica,SparkUtils.processLowFlow(records, first._2, 0)));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                         break;
                                     case "HR":
                                         try {
-                                            EMPATICA_ACCUM.add_to_map("HR", SparkUtils.processLowFlow(records, first._2, 0));
+                                            EMPATICA_ACCUM.add_to_map("HR", SparkUtils.CreateMap(Attributes.key_Empatica,SparkUtils.processLowFlow(records, first._2, 0)));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                         break;
                                     case "TEMP":
                                         try {
-                                            EMPATICA_ACCUM.add_to_map("TEMP", SparkUtils.processLowFlow(records, first._2, 0));
+                                            EMPATICA_ACCUM.add_to_map("TEMP", SparkUtils.CreateMap(Attributes.key_Empatica,SparkUtils.processLowFlow(records, first._2, 0)));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
@@ -152,12 +152,12 @@ public class Spark {
                                 }
                             }
                             break;
-//                        case "Aw": {
-//                            //Because AW sensors always send one more empty column
-//                            String[] cleaned_First = Arrays.copyOfRange(first._2, 8, first._2.length - 1);
-//                            SparkUtils.processWithClustering(records, AW_VECTOR, cleaned_First, 8, first._2.length - 1, 5, (double) 200);
-//                            break;
-//                        }
+                        case "Aw": {
+                            //Because AW sensors always send one more empty column
+                            String[] cleaned_First = Arrays.copyOfRange(first._2, 8, first._2.length - 1);
+                            AW_ACCUM.add_to_map("AW", SparkUtils.CreateMap(Attributes.key_Aw, SparkUtils.processWithClustering(records, cleaned_First, 8, first._2.length - 1, 5, (double) 200)));
+                            break;
+                        }
 //                        case "Camera":
 //                            CAMERA_VECTOR.add(SparkUtils.process_camera(first, records));
 //                            break;

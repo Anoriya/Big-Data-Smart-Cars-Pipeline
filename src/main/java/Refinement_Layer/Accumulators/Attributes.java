@@ -8,5 +8,5 @@ public class Attributes {
     public static final String[] key_BR_RR = new String[]{"BR", "RtoR"};
     public static final String[] key_ECG = new String[]{"ECG"};
     public static final String[] key_General = new String[]{"HR", "BR", "Temp", "Posture", "Activity", "Acceleration", "Battery", "BRAmplitude", "ECGAmplitude", "ECGNoise", "XMin", "XPeak", "YMin", "YPeak", "ZMin", "ZPeak"};
-
+    public static final String[] key_Empatica = new String[]{"Champ 1", "Champ 2", "Champ 3"};
 }
