@@ -144,7 +144,7 @@ public class Spark {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
-                            } else {
+                            } else if (key.equals("General")){
                                 try {
                                     ZEPHYR_ACCUM.add_to_map("GENERAL", SparkUtils.CreateMap(Attributes.key_General, SparkUtils.process_low_frequency(first._2, 1)));
                                 } catch (Exception e) {
