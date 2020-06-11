@@ -72,6 +72,8 @@ public class Spark {
 //        List<Double> CONCENTRATION_Vector = new ArrayList<Double>();
 
         topic_value.foreachRDD(rdd -> {
+            EMPATICA_ACCUM.reset();
+            ZEPHYR_ACCUM.reset();
             rdd.foreachPartition(records -> {
                 try {
                     //Taking the first record to check which partition we are in
@@ -183,13 +185,11 @@ public class Spark {
                     System.out.println("EMPTYYY");
                 }
             });
-            System.out.println("EMPATICA : " + EMPATICA_ACCUM.value());
-            System.out.println("Zephyr : " + ZEPHYR_ACCUM.value());
             try {
                 CouchDB.createDocument(EMPATICA_ACCUM.value());
                 CouchDB.createDocumentMapped(ZEPHYR_ACCUM.value());
             } catch (Exception e) {
-                System.out.println("Ta7che");
+                System.out.println("Ta7che : " + e.getMessage());
             }
         });
 

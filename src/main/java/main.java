@@ -19,6 +19,31 @@ public class main {
 
 
       Spark spark = new Spark();
+//        HttpClient httpClient = new StdHttpClient.Builder()
+//                .url("http://localhost:5984").username("admin")
+//                .password("Inchalah1.")
+//                .build();
+//        CouchDbInstance dbInstance = new StdCouchDbInstance(httpClient);
+//        CouchDbConnector db = new StdCouchDbConnector("test", dbInstance);
+//        db.createDatabaseIfNotExists();
+//
+//        Map<String, Object> document = new HashMap<String, Object>();
+//        Map<String, Object> Empatica = new HashMap<String, Object>();
+//        Map<String, Object> Zephyr = new HashMap<String, Object>();
+//        Map<String, Object> Acc = new HashMap<String, Object>();
+//        int[] array = new int[2];
+//        array[0]=12;
+//        array[1]=15;
+//        Acc.put("val1", 60);
+//        Acc.put("val2", 69);
+//        Empatica.put("HR" , 32);
+//        Empatica.put("ACC" , Acc);
+//        Zephyr.put("BRR", array);
+//        document.put("Empatica", Empatica);
+//        document.put("Zephyr", Zephyr);
+//        System.out.println(document);
+//        db.create(document);
+//        System.out.println(document);
 
     }
 }
