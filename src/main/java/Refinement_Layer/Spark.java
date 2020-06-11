@@ -70,12 +70,13 @@ public class Spark {
 //        List<Double> QUANTITY_Vector = new ArrayList<Double>();
 //        List<Double> CONCENTRATION_Vector = new ArrayList<Double>();
 
-        CAMERA_ACCUM.reset();
-        AIRQ_ACCUM.reset();
-        EMPATICA_ACCUM.reset();
-        ZEPHYR_ACCUM.reset();
-        AW_ACCUM.reset();
+
         topic_value.foreachRDD(rdd -> {
+            CAMERA_ACCUM.reset();
+            AIRQ_ACCUM.reset();
+            EMPATICA_ACCUM.reset();
+            ZEPHYR_ACCUM.reset();
+            AW_ACCUM.reset();
             rdd.foreachPartition(records -> {
                 try {
                     //Taking the first record to check which partition we are in
@@ -191,16 +192,19 @@ public class Spark {
                     System.out.println("EMPTYYY");
                 }
             });
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("Emaptica", EMPATICA_ACCUM.value());
+            map.put("Zephyr", ZEPHYR_ACCUM.value());
+            map.put("AirQuality", AIRQ_ACCUM.value());
+            map.put("Aw", AW_ACCUM.value().get("AW"));
+            map.put("Camera", CAMERA_ACCUM.value());
+            try {
+                CouchDB.createDocument(map);
+            } catch (Exception e) {
+                System.out.println("Oops : " + e.getMessage());
+            }
         });
-        try {
-            CouchDB.createDocument(EMPATICA_ACCUM.value());
-            CouchDB.createDocument(ZEPHYR_ACCUM.value());
-            CouchDB.createDocument(AW_ACCUM.value());
-            CouchDB.createDocumentOfListMapped(CAMERA_ACCUM.value());
-            CouchDB.createDocument(AIRQ_ACCUM.value());
-        } catch (Exception e) {
-            System.out.println("Oops : " + e.getMessage());
-        }
+
 
 
         // Start the computation

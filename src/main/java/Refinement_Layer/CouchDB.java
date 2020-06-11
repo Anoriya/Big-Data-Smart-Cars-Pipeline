@@ -51,7 +51,7 @@ public class CouchDB {
         getDb().create(document);
     }
 
-    public static void createDocument(Map<String, Map<String, Double>> doc) throws MalformedURLException {
+    public static void createDocument(Map<String, Object> doc) throws MalformedURLException {
         getDb().createDatabaseIfNotExists();
         System.out.println(doc);
         getDb().create(doc);
