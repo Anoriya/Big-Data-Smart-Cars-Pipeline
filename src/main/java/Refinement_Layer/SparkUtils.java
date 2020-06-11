@@ -445,4 +445,12 @@ public class SparkUtils implements Serializable {
         }
         return map;
     }
+
+    public static Map<String, String> createMapString(String[] key, String[] value) {
+        Map<String, String> map = new HashMap<String, String>();
+        for (int i = 0; i < value.length; i++) {
+            map.put(key[i], value[i]);
+        }
+        return map;
+    }
 }

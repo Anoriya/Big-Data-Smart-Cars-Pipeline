@@ -158,9 +158,9 @@ public class Spark {
 //                            SparkUtils.processWithClustering(records, AW_VECTOR, cleaned_First, 8, first._2.length - 1, 5, (double) 200);
 //                            break;
 //                        }
-//                        case "Camera":
-//                            CAMERA_VECTOR.add(SparkUtils.process_camera(first, records));
-//                            break;
+                        case "Camera":
+                            CAMERA_ACCUM.add(SparkUtils.process_camera(first, records));
+                            break;
 //                        case "AirQuality": {
 //                            String[] cleaned_First = Arrays.copyOfRange(first._2, 2, first._2.length);
 //                            if (key.equals("Quantity")) {
