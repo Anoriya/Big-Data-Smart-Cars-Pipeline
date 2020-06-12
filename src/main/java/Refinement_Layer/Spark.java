@@ -1,6 +1,7 @@
 package Refinement_Layer;
 
 
+import Kafka.CarProducer;
 import Refinement_Layer.Accumulators.Attributes;
 import Refinement_Layer.Accumulators.CameraAccumulator;
 import Refinement_Layer.Accumulators.MapAccumulator;
@@ -194,9 +195,13 @@ public class Spark {
                     System.out.println("EMPTYYY");
                 }
             });
-
+            // Save the sensors data timestamped to couchDB database
             SparkUtils.save_to_database(EMPATICA_ACCUM, ZEPHYR_ACCUM, AIRQ_ACCUM, CAMERA_ACCUM, AW_ACCUM);
-        });
+
+            //Predict and send result
+            CarProducer.sendRecord("result", "Stressed");
+
+            });
 
 
 
