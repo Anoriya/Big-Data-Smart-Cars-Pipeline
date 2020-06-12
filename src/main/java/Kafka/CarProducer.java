@@ -15,8 +15,8 @@ public class CarProducer {
 
     private static Properties getProperties(){
         if (props == null){
-            Properties props = new Properties();
-            props.put("bootstrap.servers", "quickstart.cloudera:9092");
+            props = new Properties();
+            props.put("bootstrap.servers", "localhost:9092");
             props.put("acks", "all");
             props.put("retries", 0);
             props.put("batch.size", 16384);
@@ -30,7 +30,8 @@ public class CarProducer {
 
     private static Producer<String, String> getProducer() {
         if (producer == null){
-            producer = new KafkaProducer<>(getProperties());
+            getProperties();
+            producer = new KafkaProducer<>(props);
         }
         return producer;
     }
