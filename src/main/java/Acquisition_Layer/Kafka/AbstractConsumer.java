@@ -14,7 +14,7 @@ import java.util.Properties;
 
 public abstract class AbstractConsumer implements Runnable {
 
-    private final static String BOOTSTRAP_SERVERS = "localhost:9092";
+    private final static String BOOTSTRAP_SERVERS = "quickstart.cloudera:9092";
     protected final Consumer<String, String> consumer;
     protected String topic, filepath, filename;
 

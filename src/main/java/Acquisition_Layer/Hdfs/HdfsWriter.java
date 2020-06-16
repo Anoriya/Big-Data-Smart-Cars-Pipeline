@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class HdfsWriter {
 
     private static final Logger logger = Logger.getLogger("io.saagie.example.hdfs.Main");
-    private final String HDFSURI = "hdfs://localhost:8020";
+    private final String HDFSURI = "hdfs://quickstart.cloudera:8020";
     private final Configuration CONF = new Configuration();
     private final FileSystem FS;
 
@@ -39,11 +39,11 @@ public class HdfsWriter {
     public void writeLineIntoOutputStream(String fileContent, FSDataOutputStream outputStream) throws IOException {
 
         //==== Write line
-        logger.info("Begin Write line into file");
+//        logger.info("Begin Write line into file");
 
         //Cassical output stream usage
         outputStream.writeBytes(fileContent);
-        logger.info("End Write line into hdfs");
+//        logger.info("End Write line into hdfs");
 
     }
 
