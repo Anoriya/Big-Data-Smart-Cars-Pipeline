@@ -91,14 +91,14 @@ public class Spark {
                         case "Empatica":
                             if (key.equals("ACC")) {
                                 try {
-                                    EMPATICA_ACCUM.add_to_map("ACC", SparkUtils.createMap(Attributes.key_Empatica,SparkUtils.processLowFlow(records, first._2, 0)));
+                                    EMPATICA_ACCUM.add_to_map("ACC", SparkUtils.createMap(Attributes.key_Empatica, SparkUtils.processLowFlow(records, first._2, 0)));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             } else if (key.equals("IBI")) {
                                 //Get the value for which heartbeat duration is the longest
                                 try {
-                                    EMPATICA_ACCUM.add_to_map("IBI", SparkUtils.createMap(Attributes.key_Empatica,SparkUtils.maxHeartbeat.call(first._2, records)));
+                                    EMPATICA_ACCUM.add_to_map("IBI", SparkUtils.createMap(Attributes.key_Empatica, SparkUtils.maxHeartbeat.call(first._2, records)));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -106,28 +106,28 @@ public class Spark {
                                 switch (key) {
                                     case "BVP":
                                         try {
-                                            EMPATICA_ACCUM.add_to_map("BVP", SparkUtils.createMap(Attributes.key_Empatica,SparkUtils.processLowFlow(records, first._2, 0)));
+                                            EMPATICA_ACCUM.add_to_map("BVP", SparkUtils.createMap(Attributes.key_Empatica, SparkUtils.processLowFlow(records, first._2, 0)));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                         break;
                                     case "EDA":
                                         try {
-                                            EMPATICA_ACCUM.add_to_map("EDA", SparkUtils.createMap(Attributes.key_Empatica,SparkUtils.processLowFlow(records, first._2, 0)));
+                                            EMPATICA_ACCUM.add_to_map("EDA", SparkUtils.createMap(Attributes.key_Empatica, SparkUtils.processLowFlow(records, first._2, 0)));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                         break;
                                     case "HR":
                                         try {
-                                            EMPATICA_ACCUM.add_to_map("HR", SparkUtils.createMap(Attributes.key_Empatica,SparkUtils.processLowFlow(records, first._2, 0)));
+                                            EMPATICA_ACCUM.add_to_map("HR", SparkUtils.createMap(Attributes.key_Empatica, SparkUtils.processLowFlow(records, first._2, 0)));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                         break;
                                     case "TEMP":
                                         try {
-                                            EMPATICA_ACCUM.add_to_map("TEMP", SparkUtils.createMap(Attributes.key_Empatica,SparkUtils.processLowFlow(records, first._2, 0)));
+                                            EMPATICA_ACCUM.add_to_map("TEMP", SparkUtils.createMap(Attributes.key_Empatica, SparkUtils.processLowFlow(records, first._2, 0)));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
@@ -199,10 +199,14 @@ public class Spark {
             SparkUtils.save_to_database(EMPATICA_ACCUM, ZEPHYR_ACCUM, AIRQ_ACCUM, CAMERA_ACCUM, AW_ACCUM);
 
             //Predict and send result
-            CarProducer.sendRecord("result", Double.toString(Math.random()));
+            if (Math.random() > 0.5)
+                CarProducer.sendRecord("result", "Stressed");
+            else {
+                CarProducer.sendRecord("result", "Not Stressed");
 
-            });
+            }
 
+        });
 
 
         // Start the computation
