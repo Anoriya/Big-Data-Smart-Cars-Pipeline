@@ -199,7 +199,7 @@ public class Spark {
             SparkUtils.save_to_database(EMPATICA_ACCUM, ZEPHYR_ACCUM, AIRQ_ACCUM, CAMERA_ACCUM, AW_ACCUM);
 
             //Predict and send result
-            CarProducer.sendRecord("result", "Stressed");
+            CarProducer.sendRecord("result", Double.toString(Math.random()));
 
             });
 
