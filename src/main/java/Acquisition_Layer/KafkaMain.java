@@ -4,7 +4,7 @@ import Acquisition_Layer.Kafka.*;
 
 import java.io.IOException;
 
-public class main {
+public class KafkaMain {
     public static void main(String[] args) throws InterruptedException, IOException {
 
 
