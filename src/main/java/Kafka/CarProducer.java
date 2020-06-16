@@ -16,7 +16,7 @@ public class CarProducer {
     private static Properties getProperties(){
         if (props == null){
             props = new Properties();
-            props.put("bootstrap.servers", "localhost:9092");
+            props.put("bootstrap.servers", "quickstart.cloudera:9092");
             props.put("acks", "all");
             props.put("retries", 0);
             props.put("batch.size", 16384);
@@ -40,6 +40,5 @@ public class CarProducer {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
         LocalDateTime date = LocalDateTime.now();
         getProducer().send(new ProducerRecord<String, String>(topic, formatter.format(date), record));
-        getProducer().close();
     }
 }

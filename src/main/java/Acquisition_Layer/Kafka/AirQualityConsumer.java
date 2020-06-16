@@ -28,7 +28,7 @@ public class AirQualityConsumer extends AbstractConsumer {
         FSDataOutputStream outputStream_CONCENTRATION = csv_writer.createFileAndOutputStream(filepath, filename + "-CONCENTRATION-" + ".csv");
 
         // While we're still at today
-        while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), date.getHour(), date.getMinute() + 1))) {
+        while (LocalDateTime.now().isBefore(LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), date.getHour()+1, date.getMinute()))) {
             ConsumerRecords<String, String> records = this.consumer.poll(Duration.ofMillis(2000));
             for (ConsumerRecord<String, String> record : records) {
                 switch (record.key()) {
